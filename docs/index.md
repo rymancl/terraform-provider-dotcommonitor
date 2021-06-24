@@ -7,7 +7,7 @@ This is a Terraform provider for [Dotcom-Monitor](https://www.dotcom-monitor.com
 Terraform 0.13 and later:
 ```hcl
 terraform {
-  required_version = "~> 0.15"
+  required_version = ">= 0.13"
   required_providers {
     dotcommonitor = {
       source  = "rymancl/dotcommonitor"
