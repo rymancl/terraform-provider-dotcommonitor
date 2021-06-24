@@ -1,0 +1,2 @@
+variable "doctommonitor_uid" {
+}
