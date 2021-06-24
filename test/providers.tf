@@ -1,9 +1,9 @@
 terraform {
-  required_version = "~> 1.0"
+  required_version = ">= 0.13"
   required_providers {
     dotcommonitor = {
-      source  = "github.com/rymancl/dotcommonitor"
-      version = "~> 0.0.1"
+      source  = "rymancl/dotcommonitor"
+      version = "~> 0.1"
     }
   }
 }
