@@ -277,7 +277,7 @@ func resourceTaskCreate(d *schema.ResourceData, meta interface{}) error {
 		SSLCheckCertificateDate:       d.Get("ssl_check_certificate_date").(bool),
 		SSLCheckCertificateRevocation: d.Get("ssl_check_certificate_revocation").(bool),
 		SSLCheckCertificateUsage:      d.Get("ssl_check_certificate_usage").(bool),
-		SSLExpirationReminderInDays:   d.Get("ssl_expiration_reminder_in_days").(int),
+		SSLExpirationReminderInDays:   strconv.Itoa(d.Get("ssl_expiration_reminder_in_days").(int)), // HACK: stored as string in API
 		SSLClientCertificate:          d.Get("ssl_client_certificate").(string),
 		FullPageDownload:              d.Get("full_page_download").(bool),
 		DownloadHTML:                  d.Get("download_html").(bool),
@@ -389,7 +389,7 @@ func resourceTaskUpdate(d *schema.ResourceData, meta interface{}) error {
 		SSLCheckCertificateDate:       d.Get("ssl_check_certificate_date").(bool),
 		SSLCheckCertificateRevocation: d.Get("ssl_check_certificate_revocation").(bool),
 		SSLCheckCertificateUsage:      d.Get("ssl_check_certificate_usage").(bool),
-		SSLExpirationReminderInDays:   d.Get("ssl_expiration_reminder_in_days").(int),
+		SSLExpirationReminderInDays:   strconv.Itoa(d.Get("ssl_expiration_reminder_in_days").(int)), // HACK: stored as string in API
 		SSLClientCertificate:          d.Get("ssl_client_certificate").(string),
 		FullPageDownload:              d.Get("full_page_download").(bool),
 		DownloadHTML:                  d.Get("download_html").(bool),

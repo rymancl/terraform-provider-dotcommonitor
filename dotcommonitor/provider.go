@@ -27,6 +27,7 @@ func Provider() *schema.Provider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
+			"dotcommonitor_task":   dataTask(),
 			"dotcommonitor_device": dataDevice(),
 			"dotcommonitor_group":  dataGroup(),
 		},

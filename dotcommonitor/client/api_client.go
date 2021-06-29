@@ -125,6 +125,48 @@ func (c *APIClient) GetTask(task *Task) error {
 	return nil
 }
 
+// GetTaskListByDevice ... gets a list of tasks for the device & returns a ref to the tasks and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/get-task-list-by-device/
+func (c *APIClient) GetTaskListByDevice(device *Device, tasks *[]Task) error {
+	apiPath := fmt.Sprintf("device/%s/tasks", fmt.Sprint(device.ID))
+
+	var resp []int
+
+	if err := c.Do("GET", apiPath, nil, &resp); err != nil {
+		return fmt.Errorf("Failed to get task list by device: %s", err)
+	}
+
+	for _, item := range resp {
+		task := &Task{}
+		task.ID = item
+		if taskErr := c.GetTask(task); taskErr != nil {
+			return fmt.Errorf("GetTaskListByDevice failed: %v", taskErr)
+		}
+		*tasks = append(*tasks, *task)
+	}
+
+	return nil
+}
+
+// GetDeviceTasksByName ... gets a task list for the device by name & returns a ref to the tasks and any error
+func (c *APIClient) GetDeviceTasksByName(deviceID int, name string, tasks *[]Task) error {
+	device := &Device{}
+	device.ID = deviceID
+	var taskList []Task
+
+	if deviceErr := c.GetTaskListByDevice(device, &taskList); deviceErr != nil {
+		return fmt.Errorf("GetDeviceTasksByName failed: %v", deviceErr)
+	}
+
+	for _, item := range taskList {
+		if item.Name == name {
+			*tasks = append(*tasks, item)
+		}
+	}
+
+	return nil
+}
+
 // UpdateTask ... updates the task by ID & returns a ref to the task and any error
 // https://wiki.dotcom-monitor.com/knowledge-base/edit-task/
 func (c *APIClient) UpdateTask(task *Task) error {
