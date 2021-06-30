@@ -3,8 +3,5 @@
 .vs
 .idea
 
-# Terraform (for testing)
-**.terraform
-**.tfstate*
-**.tfvars
-**.terraform.lock.hcl
+# Local testing/debugging
+.dm-tf-debug

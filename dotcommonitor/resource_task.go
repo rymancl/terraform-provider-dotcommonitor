@@ -1,16 +1,3 @@
-// Copyright (C) 2019 IHS Markit.
-// All Rights Reserved
-//
-// NOTICE: All information contained herein is, and remains
-// the property of IHS Markit and its suppliers,
-// if any. The intellectual and technical concepts contained
-// herein are proprietary to IHS Markit and its suppliers
-// and may be covered by U.S. and Foreign Patents, patents in
-// process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from IHS Markit.
-
 package dotcommonitor
 
 import (
@@ -290,7 +277,7 @@ func resourceTaskCreate(d *schema.ResourceData, meta interface{}) error {
 		SSLCheckCertificateDate:       d.Get("ssl_check_certificate_date").(bool),
 		SSLCheckCertificateRevocation: d.Get("ssl_check_certificate_revocation").(bool),
 		SSLCheckCertificateUsage:      d.Get("ssl_check_certificate_usage").(bool),
-		SSLExpirationReminderInDays:   d.Get("ssl_expiration_reminder_in_days").(int),
+		SSLExpirationReminderInDays:   strconv.Itoa(d.Get("ssl_expiration_reminder_in_days").(int)), // HACK: stored as string in API
 		SSLClientCertificate:          d.Get("ssl_client_certificate").(string),
 		FullPageDownload:              d.Get("full_page_download").(bool),
 		DownloadHTML:                  d.Get("download_html").(bool),
@@ -402,7 +389,7 @@ func resourceTaskUpdate(d *schema.ResourceData, meta interface{}) error {
 		SSLCheckCertificateDate:       d.Get("ssl_check_certificate_date").(bool),
 		SSLCheckCertificateRevocation: d.Get("ssl_check_certificate_revocation").(bool),
 		SSLCheckCertificateUsage:      d.Get("ssl_check_certificate_usage").(bool),
-		SSLExpirationReminderInDays:   d.Get("ssl_expiration_reminder_in_days").(int),
+		SSLExpirationReminderInDays:   strconv.Itoa(d.Get("ssl_expiration_reminder_in_days").(int)), // HACK: stored as string in API
 		SSLClientCertificate:          d.Get("ssl_client_certificate").(string),
 		FullPageDownload:              d.Get("full_page_download").(bool),
 		DownloadHTML:                  d.Get("download_html").(bool),
