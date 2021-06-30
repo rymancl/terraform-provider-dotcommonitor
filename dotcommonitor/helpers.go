@@ -21,7 +21,6 @@ func convertStringListToIntList(csvString string) []int {
 
 	for i, item := range sp {
 		intList[i], _ = strconv.Atoi(item)
-
 	}
 
 	return intList
@@ -89,6 +88,18 @@ func constructNotificationsNotificationGroupList(notificationGroups []interface{
 	}
 
 	return nnGroupList
+}
+
+// convertLocationsToIntList ... type asserting a list of string to a list of int
+func convertLocationsToIntList(interfaceList []interface{}) []int {
+	//log.Printf("[Dotcom-Monitor] convertLocationsToIntList - Converting %v to int[]", interfaceList)
+	intList := make([]int, len(interfaceList))
+
+	for i := range interfaceList {
+		intList[i] = interfaceList[i].(int)
+	}
+
+	return intList
 }
 
 //////////////////////////////
