@@ -1,2 +1,0 @@
-variable "doctommonitor_uid" {
-}

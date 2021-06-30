@@ -15,7 +15,7 @@ type Task struct {
 	SSLCheckCertificateDate       bool        `json:"CheckCertificateDate"`
 	SSLCheckCertificateRevocation bool        `json:"CheckCertificateRevocation"`
 	SSLCheckCertificateUsage      bool        `json:"CheckCertificateUsage"`
-	SSLExpirationReminderInDays   int         `json:"ExpirationReminderInDays,omitempty"`
+	SSLExpirationReminderInDays   string      `json:"ExpirationReminderInDays,omitempty"` // Provider accepts int, API needs string
 	SSLClientCertificate          string      `json:"ClientCertificate,omitempty"`
 	FullPageDownload              bool        `json:"FullPageDownload"`
 	DownloadHTML                  bool        `json:"Download_Html"`

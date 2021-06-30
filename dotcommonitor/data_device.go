@@ -33,11 +33,9 @@ func dataDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	//device := &dotcommonitor.Device{}
 	var devices []client.Device
 	api := meta.(*client.APIClient)
 
-	//err := client.GetDevice(device)
 	platformID := d.Get("platform_id").(int)
 	name := d.Get("name").(string)
 	err := api.GetDevicesByName(platformID, name, &devices)
