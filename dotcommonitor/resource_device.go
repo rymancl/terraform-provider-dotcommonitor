@@ -40,10 +40,10 @@ func resourceDevice() *schema.Resource {
 				ValidateFunc: validation.IntInSlice([]int{60, 180, 300, 600, 900, 1800, 2700, 3600, 7200, 10800}), // in seconds
 			},
 			"locations": {
-				Type:         schema.TypeString,
+				Type:         schema.TypeList,
 				Optional:     true,
-				Default:      "1,2,3,4,6,11,13,14,15,17,18,19,23,43,68,71,72,73,74,97,113,118,138,153,181,184,233", // default to all locations
-				ValidateFunc: validation.StringLenBetween(1, 255),
+				Elem: 		  &schema.Schema{Type: schema.TypeInt},
+				//ValidateFunc: checkValidLocationIds(),  // TODO after locations data source is created
 			},
 			"avoid_simultaneous_checks": {
 				Type:     schema.TypeBool,
@@ -123,7 +123,7 @@ func resourceDeviceCreate(d *schema.ResourceData, meta interface{}) error {
 		Name:                    d.Get("name").(string),
 		PlatformID:              d.Get("platform_id").(int),
 		Frequency:               d.Get("frequency").(int),
-		Locations:               convertStringListToIntList(d.Get("locations").(string)),
+		Locations:               convertLocationsToIntList(d.Get("locations").([]interface{})),
 		AvoidSimultaneousChecks: d.Get("avoid_simultaneous_checks").(bool),
 		AlertSilenceMin:         d.Get("alert_silence_min").(int),
 		FalsePositiveCheck:      d.Get("false_positive_check").(bool),
@@ -202,7 +202,7 @@ func resourceDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 		Name:                    d.Get("name").(string),
 		PlatformID:              d.Get("platform_id").(int),
 		Frequency:               d.Get("frequency").(int),
-		Locations:               convertStringListToIntList(d.Get("locations").(string)),
+		Locations:               convertLocationsToIntList(d.Get("locations").([]interface{})),
 		AvoidSimultaneousChecks: d.Get("avoid_simultaneous_checks").(bool),
 		AlertSilenceMin:         d.Get("alert_silence_min").(int),
 		FalsePositiveCheck:      d.Get("false_positive_check").(bool),
