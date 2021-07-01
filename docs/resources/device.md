@@ -30,7 +30,7 @@ resource "dotcommonitor_device" "example" {
 * `notifications_group` - **(Optional, map{string})** The map of groups to send notifications to. Note that groups can only be assigned to a device, you cannot assign a device to a group. Defined below.
 
 ### locations
-Can be any combination of valid public or private location ID's. This argument can be used in combination with the `locations` data source or defined by providing ID's.
+Can be any combination of valid public or private location ID's. This argument can be used in combination with the [locations data source](https://registry.terraform.io/providers/rymancl/dotcommonitor/latest/docs/data-sources/locations) or defined by providing ID's manully.
 
 Public location list mapping:
 
