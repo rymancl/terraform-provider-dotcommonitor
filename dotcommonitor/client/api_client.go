@@ -485,3 +485,102 @@ func (c *APIClient) GetGroupsByName(name string, groups *[]Group) error {
 
 	return nil
 }
+
+//////////////////////////////
+// Location functions
+//////////////////////////////
+
+// GetLocations ... gets the list of all locations available in the account by platform ID
+func (c *APIClient) GetLocations(platformID int, includeUnavailable bool, locations *[]Location) error {
+	apiPath := fmt.Sprintf("locations/%s", fmt.Sprint(platformID))
+
+	var resp []Location
+
+	if err := c.Do("GET", apiPath, nil, &resp); err != nil {
+		return fmt.Errorf("GetLocations failed: %s", err)
+	}
+
+	for _, item := range resp {	
+		if (!item.IsDeleted) {  // don't include deleted locations
+			if ((item.Available) || (!item.Available && includeUnavailable)) {
+				*locations = append(*locations, item)
+			}
+		}
+	}
+
+	return nil
+}
+
+// GetLocation ... gets the location by id and platform ID
+func (c *APIClient) GetLocation(platformID int, locationID int, location *Location) error {
+	var locationsList []Location
+
+	if locationsErr := c.GetLocations(platformID, true, &locationsList); locationsErr != nil {
+		return fmt.Errorf("GetLocation failed: %v", locationsErr)
+	}
+
+	for _, item := range locationsList {
+		if (item.ID == locationID) {
+			*location = item
+			return nil
+		}
+	}
+
+	return nil
+}
+
+// GetLocationsByName ... gets the locations by name and platform ID
+func (c *APIClient) GetLocationsByName(platformID int, name string, includeUnavailable bool, locations *[]Location) error {
+	var locationsList []Location
+
+	if locationsErr := c.GetLocations(platformID, includeUnavailable, &locationsList); locationsErr != nil {
+		return fmt.Errorf("GetLocationsByName failed: %v", locationsErr)
+	}
+
+	for _, item := range locationsList {
+		if (item.Name == name) {
+			*locations = append(*locations, item)
+		}
+	}
+
+	return nil
+}
+
+// GetPublicLocations ... gets the public locations in the account for the platform ID
+func (c *APIClient) GetPublicLocations(platformID int, includeUnavailable bool, locations *[]Location) error {
+	var locationsList []Location
+
+	if locationsErr := c.GetLocations(platformID, includeUnavailable, &locationsList); locationsErr != nil {
+		return fmt.Errorf("GetPublicLocations failed: %v", locationsErr)
+	}
+
+	for _, item := range locationsList {
+		if (!item.IsPrivate) {
+			*locations = append(*locations, item)
+		}
+	}
+
+	return nil
+}
+
+// GetPrivateLocations ... gets the private locations in the account for the platform ID
+func (c *APIClient) GetPrivateLocations(platformID int, includeUnavailable bool, locations *[]Location) error {
+	var locationsList []Location
+
+	if locationsErr := c.GetLocations(platformID, includeUnavailable, &locationsList); locationsErr != nil {
+		return fmt.Errorf("GetPrivateLocations failed: %v", locationsErr)
+	}
+
+	// API returned no locations
+	if len(locationsList) < 1 {
+		return fmt.Errorf("GetPrivateLocations: No private locations found on the platform %v.", platformID)
+	}
+
+	for _, item := range locationsList {
+		if (item.IsPrivate) {
+			*locations = append(*locations, item)
+		}
+	}
+
+	return nil
+}
