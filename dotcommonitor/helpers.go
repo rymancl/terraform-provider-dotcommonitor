@@ -3,6 +3,7 @@ package dotcommonitor
 import (
 	"bytes"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -24,6 +25,38 @@ func convertStringListToIntList(csvString string) []int {
 	}
 
 	return intList
+}
+
+// convertInterfaceListToIntList ... type asserting a list of interfaces to a list of int
+func convertInterfaceListToIntList(interfaceList []interface{}) []int {
+	//log.Printf("[Dotcom-Monitor] convertInterfaceListToIntList - Converting %v to int[]", interfaceList)
+	intList := make([]int, len(interfaceList))
+
+	for i := range interfaceList {
+		intList[i] = interfaceList[i].(int)
+	}
+
+	return intList
+}
+
+// convertInterfaceListToStringList ... type asserting a list of interfaces to a list of string
+func convertInterfaceListToStringList(interfaceList []interface{}) []string {
+	//log.Printf("[Dotcom-Monitor] convertInterfaceListToStringList - Converting %v to int[]", interfaceList)
+	stringList := make([]string, len(interfaceList))
+
+	for i := range interfaceList {
+		stringList[i] = interfaceList[i].(string)
+	}
+
+	return stringList
+}
+
+// intInList .. checks if the int is in the list of ints
+func intInList(intList []int, num int) bool {
+	sort.Ints(intList)
+    index := sort.Search(len(intList), func(i int) bool { return intList[i] >= num })
+	result := (index < len(intList)) && (intList[index] == num)
+    return result
 }
 
 //////////////////////////////
@@ -90,17 +123,7 @@ func constructNotificationsNotificationGroupList(notificationGroups []interface{
 	return nnGroupList
 }
 
-// convertLocationsToIntList ... type asserting a list of string to a list of int
-func convertLocationsToIntList(interfaceList []interface{}) []int {
-	//log.Printf("[Dotcom-Monitor] convertLocationsToIntList - Converting %v to int[]", interfaceList)
-	intList := make([]int, len(interfaceList))
 
-	for i := range interfaceList {
-		intList[i] = interfaceList[i].(int)
-	}
-
-	return intList
-}
 
 //////////////////////////////
 // Group helpers
@@ -143,4 +166,50 @@ func constructGroupAddresses(schemaAddresses []interface{}) []client.Addresses {
 	}
 
 	return addressList
+}
+
+//////////////////////////////
+// Location helpers
+//////////////////////////////
+
+// locationListContainsLocationID .. checks if provided location ID is valid in the list of locations
+func locationListContainsLocationID(locations []client.Location, id int) bool {
+    for _, item := range locations {
+        if item.ID == id {
+            return true
+        }
+    }
+    return false
+}
+
+// locationListContainsLocationName .. checks if provided location name is valid in the list of locations
+func locationListContainsLocationName(locations []client.Location, name string) bool {
+    for _, item := range locations {
+        if item.Name == name {
+            return true
+        }
+    }
+    return false
+}
+
+// removeRestrictiveLocations .. removes any locations that may be considered restrictive by
+//  country-wide firewalls, government regulations, restrictions, etc.
+//  This list can be updated as appropriate. 
+func removeRestrictiveLocations(locations []client.Location) []client.Location {
+	var restrictiveLocationIds = []int {11, 72, 184, 445, 446, 447, 448}
+	// 11  = Hong Kong
+	// 72  = Shanghai
+	// 184 = Beijing
+	// 445 = Chengdu
+	// 446 = Guangzhou
+	// 447 = Qingdao
+	// 448 = Shenzhen
+
+	var trimmedLocationList []client.Location
+	for _, item := range locations {  // iterate selected locations
+		if (!intInList(restrictiveLocationIds, item.ID) && !locationListContainsLocationID(trimmedLocationList, item.ID)) {
+			trimmedLocationList = append(trimmedLocationList, item)
+		}
+    }
+	return trimmedLocationList
 }

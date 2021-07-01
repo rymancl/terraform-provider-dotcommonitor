@@ -30,6 +30,8 @@ func Provider() *schema.Provider {
 			"dotcommonitor_task":   dataTask(),
 			"dotcommonitor_device": dataDevice(),
 			"dotcommonitor_group":  dataGroup(),
+			"dotcommonitor_location": dataLocation(),
+			"dotcommonitor_locations": dataLocations(),
 		},
 
 		ConfigureFunc: providerConfigure,

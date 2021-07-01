@@ -43,7 +43,6 @@ func resourceDevice() *schema.Resource {
 				Type:         schema.TypeList,
 				Optional:     true,
 				Elem: 		  &schema.Schema{Type: schema.TypeInt},
-				//ValidateFunc: checkValidLocationIds(),  // TODO after locations data source is created
 			},
 			"avoid_simultaneous_checks": {
 				Type:     schema.TypeBool,
@@ -123,7 +122,7 @@ func resourceDeviceCreate(d *schema.ResourceData, meta interface{}) error {
 		Name:                    d.Get("name").(string),
 		PlatformID:              d.Get("platform_id").(int),
 		Frequency:               d.Get("frequency").(int),
-		Locations:               convertLocationsToIntList(d.Get("locations").([]interface{})),
+		Locations:               convertInterfaceListToIntList(d.Get("locations").([]interface{})),
 		AvoidSimultaneousChecks: d.Get("avoid_simultaneous_checks").(bool),
 		AlertSilenceMin:         d.Get("alert_silence_min").(int),
 		FalsePositiveCheck:      d.Get("false_positive_check").(bool),
@@ -202,7 +201,7 @@ func resourceDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 		Name:                    d.Get("name").(string),
 		PlatformID:              d.Get("platform_id").(int),
 		Frequency:               d.Get("frequency").(int),
-		Locations:               convertLocationsToIntList(d.Get("locations").([]interface{})),
+		Locations:               convertInterfaceListToIntList(d.Get("locations").([]interface{})),
 		AvoidSimultaneousChecks: d.Get("avoid_simultaneous_checks").(bool),
 		AlertSilenceMin:         d.Get("alert_silence_min").(int),
 		FalsePositiveCheck:      d.Get("false_positive_check").(bool),
