@@ -24,6 +24,7 @@ func Provider() *schema.Provider {
 			"dotcommonitor_task":   resourceTask(),
 			"dotcommonitor_device": resourceDevice(),
 			"dotcommonitor_group":  resourceGroup(),
+			"dotcommonitor_scheduler": resourceScheduler(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -32,6 +33,7 @@ func Provider() *schema.Provider {
 			"dotcommonitor_group":  dataGroup(),
 			"dotcommonitor_location": dataLocation(),
 			"dotcommonitor_locations": dataLocations(),
+			"dotcommonitor_scheduler": dataScheduler(),
 		},
 
 		ConfigureFunc: providerConfigure,

@@ -500,9 +500,9 @@ func (c *APIClient) GetLocations(platformID int, includeUnavailable bool, locati
 		return fmt.Errorf("GetLocations failed: %s", err)
 	}
 
-	for _, item := range resp {	
-		if (!item.IsDeleted) {  // don't include deleted locations
-			if ((item.Available) || (!item.Available && includeUnavailable)) {
+	for _, item := range resp {
+		if !item.IsDeleted { // don't include deleted locations
+			if (item.Available) || (!item.Available && includeUnavailable) {
 				*locations = append(*locations, item)
 			}
 		}
@@ -520,7 +520,7 @@ func (c *APIClient) GetLocation(platformID int, locationID int, location *Locati
 	}
 
 	for _, item := range locationsList {
-		if (item.ID == locationID) {
+		if item.ID == locationID {
 			*location = item
 			return nil
 		}
@@ -538,7 +538,7 @@ func (c *APIClient) GetLocationsByName(platformID int, name string, includeUnava
 	}
 
 	for _, item := range locationsList {
-		if (item.Name == name) {
+		if item.Name == name {
 			*locations = append(*locations, item)
 		}
 	}
@@ -555,7 +555,7 @@ func (c *APIClient) GetPublicLocations(platformID int, includeUnavailable bool, 
 	}
 
 	for _, item := range locationsList {
-		if (!item.IsPrivate) {
+		if !item.IsPrivate {
 			*locations = append(*locations, item)
 		}
 	}
@@ -577,8 +577,116 @@ func (c *APIClient) GetPrivateLocations(platformID int, includeUnavailable bool,
 	}
 
 	for _, item := range locationsList {
-		if (item.IsPrivate) {
+		if item.IsPrivate {
 			*locations = append(*locations, item)
+		}
+	}
+
+	return nil
+}
+
+//////////////////////////////
+// Scheduler functions
+//////////////////////////////
+
+// CreateScheduler ... creates a new scheduler & returns a ref to the scheduler and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/create-new-scheduler/
+func (c *APIClient) CreateScheduler(scheduler *Scheduler) error {
+	apiPath := "schedulers"
+
+	var resp CreateSchedulerResponseBlock
+
+	if err := c.Do("PUT", apiPath, scheduler, &resp); err != nil {
+		return fmt.Errorf("Failed to create scheduler: %s", err)
+	}
+
+	scheduler.ID = resp.CreateResponseBlock.Result
+
+	return nil
+}
+
+// GetScheduler ... gets the scheduler by ID & returns a ref to the scheduler and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/get-specific-scheduler-info/
+func (c *APIClient) GetScheduler(scheduler *Scheduler) error {
+	apiPath := fmt.Sprintf("scheduler/%s", fmt.Sprint(scheduler.ID))
+
+	if err := c.Do("GET", apiPath, nil, &scheduler); err != nil {
+		return fmt.Errorf("Failed to get scheduler: %s", err)
+	}
+
+	return nil
+}
+
+// GetSchedulers ... gets all scheduler IDs & returns a ref to the schedulers and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/get-list-of-schedulers/
+func (c *APIClient) GetSchedulers(schedulerIds *[]int) error {
+	apiPath := "schedulers"
+
+	if err := c.Do("GET", apiPath, nil, &schedulerIds); err != nil {
+		return fmt.Errorf("Failed to get schedulers: %s", err)
+	}
+
+	return nil
+}
+
+// UpdateScheduler ... updates the scheduler & returns a ref to the scheduler and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/edit-scheduler/
+func (c *APIClient) UpdateScheduler(scheduler *Scheduler) error {
+	apiPath := fmt.Sprintf("scheduler/%s", fmt.Sprint(scheduler.ID))
+
+	// data := &Scheduler{
+	// 	Name:                  scheduler.Name,
+	// 	Description:           scheduler.Description,
+	// 	WeeklyIntervals:       scheduler.WeeklyIntervals,
+	// 	ExcludedTimeIntervals: scheduler.ExcludedTimeIntervals,
+	// }
+
+	var resp UpdateSchedulerResponseBlock
+
+	if err := c.Do("POST", apiPath, scheduler, &resp); err != nil {
+		return fmt.Errorf("Failed to update scheduler: %s", err)
+	}
+
+	return nil
+}
+
+// DeleteScheduler ... deletes the scheduler & returns a ref to the scheduler and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/edit-scheduler/
+func (c *APIClient) DeleteScheduler(scheduler *Scheduler) error {
+	apiPath := fmt.Sprintf("scheduler/%s", fmt.Sprint(scheduler.ID))
+
+	var resp DeleteSchedulerResponseBlock
+
+	if err := c.Do("DELETE", apiPath, nil, &resp); err != nil {
+		return fmt.Errorf("Failed to delete scheduler: %s", err)
+	}
+
+	return nil
+}
+
+// GetSchedulersByName ... gets the schedulers by name
+func (c *APIClient) GetSchedulersByName(name string, schedulers *[]Scheduler) error {
+	var allSchedulerIds []int
+	var schedulersList []Scheduler
+
+	// first, get all scheduler IDs
+	if schedulersErr := c.GetSchedulers(&allSchedulerIds); schedulersErr != nil {
+		return fmt.Errorf("GetSchedulersByName failed: %v", schedulersErr)
+	}
+
+	for _, item := range allSchedulerIds {
+		var scheduler Scheduler
+		scheduler.ID = item
+		// get full scheduler details for each scheduler ID
+		if schedulerErr := c.GetScheduler(&scheduler); schedulerErr != nil {
+			return fmt.Errorf("GetSchedulersByName failed: %v", schedulerErr)
+		}
+		schedulersList = append(schedulersList, scheduler)
+	}
+
+	for _, item := range schedulersList {
+		if item.Name == name {
+			*schedulers = append(*schedulers, item)
 		}
 	}
 

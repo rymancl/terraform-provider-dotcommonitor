@@ -54,9 +54,17 @@ func convertInterfaceListToStringList(interfaceList []interface{}) []string {
 // intInList .. checks if the int is in the list of ints
 func intInList(intList []int, num int) bool {
 	sort.Ints(intList)
-    index := sort.Search(len(intList), func(i int) bool { return intList[i] >= num })
+	index := sort.Search(len(intList), func(i int) bool { return intList[i] >= num })
 	result := (index < len(intList)) && (intList[index] == num)
-    return result
+	return result
+}
+
+// stringInList .. checks if the string is in the list of strings
+func stringInList(stringList []string, s string) bool {
+	sort.Strings(stringList)
+	index := sort.Search(len(stringList), func(i int) bool { return stringList[i] >= s })
+	result := (index < len(stringList)) && (stringList[index] == s)
+	return result
 }
 
 //////////////////////////////
@@ -123,8 +131,6 @@ func constructNotificationsNotificationGroupList(notificationGroups []interface{
 	return nnGroupList
 }
 
-
-
 //////////////////////////////
 // Group helpers
 //////////////////////////////
@@ -174,29 +180,29 @@ func constructGroupAddresses(schemaAddresses []interface{}) []client.Addresses {
 
 // locationListContainsLocationID .. checks if provided location ID is valid in the list of locations
 func locationListContainsLocationID(locations []client.Location, id int) bool {
-    for _, item := range locations {
-        if item.ID == id {
-            return true
-        }
-    }
-    return false
+	for _, item := range locations {
+		if item.ID == id {
+			return true
+		}
+	}
+	return false
 }
 
 // locationListContainsLocationName .. checks if provided location name is valid in the list of locations
 func locationListContainsLocationName(locations []client.Location, name string) bool {
-    for _, item := range locations {
-        if item.Name == name {
-            return true
-        }
-    }
-    return false
+	for _, item := range locations {
+		if item.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 // removeRestrictiveLocations .. removes any locations that may be considered restrictive by
 //  country-wide firewalls, government regulations, restrictions, etc.
-//  This list can be updated as appropriate. 
+//  This list can be updated as appropriate.
 func removeRestrictiveLocations(locations []client.Location) []client.Location {
-	var restrictiveLocationIds = []int {11, 72, 184, 445, 446, 447, 448}
+	var restrictiveLocationIds = []int{11, 72, 184, 445, 446, 447, 448}
 	// 11  = Hong Kong
 	// 72  = Shanghai
 	// 184 = Beijing
@@ -206,10 +212,52 @@ func removeRestrictiveLocations(locations []client.Location) []client.Location {
 	// 448 = Shenzhen
 
 	var trimmedLocationList []client.Location
-	for _, item := range locations {  // iterate selected locations
-		if (!intInList(restrictiveLocationIds, item.ID) && !locationListContainsLocationID(trimmedLocationList, item.ID)) {
+	for _, item := range locations { // iterate selected locations
+		if !intInList(restrictiveLocationIds, item.ID) && !locationListContainsLocationID(trimmedLocationList, item.ID) {
 			trimmedLocationList = append(trimmedLocationList, item)
 		}
-    }
+	}
 	return trimmedLocationList
+}
+
+//////////////////////////////
+// Scheduler helpers
+//////////////////////////////
+
+// constructSchedulerWeeklyIntervalsList ... constructs a list of dotcommonitor.WeeklyInterval structs based on the list of weekly_intervals in the TF configuration
+func constructSchedulerWeeklyIntervalsList(weeklyIntervals []interface{}) []client.WeeklyInterval {
+	//log.Printf("[Dotcom-Monitor] Converting weekly_intervals list to dotcommonitor.WeeklyIntervals list")
+
+	wiList := make([]client.WeeklyInterval, len(weeklyIntervals))
+
+	for i, item := range weeklyIntervals {
+		var schemaMap = item.(map[string]interface{})
+
+		wiList[i] = client.WeeklyInterval{
+			Days:       convertInterfaceListToStringList(schemaMap["days"].([]interface{})),
+			FromMinute: schemaMap["from_minute"].(int),
+			ToMinute:   schemaMap["to_minute"].(int),
+			Enabled:    schemaMap["enabled"].(bool),
+		}
+	}
+
+	return wiList
+}
+
+// constructSchedulerExcludedTimeIntervalsList ... constructs a list of dotcommonitor.DateTimeInterval structs based on the list of excluded_time_intervals in the TF configuration
+func constructSchedulerExcludedTimeIntervalsList(excludedTimeIntervals []interface{}) []client.DateTimeInterval {
+	//log.Printf("[Dotcom-Monitor] Converting excluded_time_intervals list to dotcommonitor.DateTimeInterval list")
+
+	etList := make([]client.DateTimeInterval, len(excludedTimeIntervals))
+
+	for i, item := range excludedTimeIntervals {
+		var schemaMap = item.(map[string]interface{})
+
+		etList[i] = client.DateTimeInterval{
+			From: schemaMap["from_unix"].(int),
+			To:   schemaMap["to_unix"].(int),
+		}
+	}
+
+	return etList
 }
