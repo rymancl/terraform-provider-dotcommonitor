@@ -40,7 +40,7 @@ resource "dotcommonitor_device" "example" {
 ```
 
 ## Argument Reference
-* `url` - **(Required, string)** The url of the request of the task.
+* `url` - **(Required, string)** The url of the request of the task. Note: if using `get_params`, you may need to [ignore changes](https://www.terraform.io/docs/language/meta-arguments/lifecycle.html#ignore_changes) to this attribute due to the API appending parameters onto the end of the URL.
 * `name` - **(Required, string)** The name of the task.
 * `device_id` - **(Required, int)** The valid ID of a device which to add the task to.
 * `request_type` - **(Optional, string)** The type of request of the task. Can be one of "GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH". Defaults to "GET".
@@ -49,20 +49,20 @@ resource "dotcommonitor_device" "example" {
 * `keyword3` - **(Optional, string)** The words or phrases that you wish to search for in the web page content. See [keyword validation](https://wiki.dotcom-monitor.com/knowledge-base/keyword-content-validation/) for more info.
 * `username` - **(Optional, string)** The username to use for basic authentication.
 * `userpass` - **(Optional, string)** The user password to use for basic authentication.
-* `full_page_download` - **(Optional, bool)** Indicates if the task should download the full web page. Defaults to `false`.
-* `download_html` - **(Optional, bool)** Indicates if the task should download HTML. Defaults to `false`.
-* `download_frames` - **(Optional, bool)** Indicates if the task should download frames. Defaults to `false`.
-* `download_style_sheets` - **(Optional, bool)** Indicates if the task should download style sheets. Defaults to `false`.
-* `download_scripts` - **(Optional, bool)** Indicates if the task should download scripts. Defaults to `false`.
-* `download_images` - **(Optional, bool)** Indicates if the task should download images. Defaults to `false`.
-* `download_objects` - **(Optional, bool)** Indicates if the task should download objects. Defaults to `false`.
-* `download_applets` - **(Optional, bool)** Indicates if the task should download applets. Defaults to `false`.
-* `download_additional` - **(Optional, bool)** Indicates if the task should download additional content. Defaults to `false`.
-* `ssl_check_certificate_authority` - **(Optional, bool)** Indicates if the task should check the SSL certificate authority. Defaults to `true`.
-* `ssl_check_certificate_cn` - **(Optional, bool)** Indicates if the task should check the SSL certificate CN. Defaults to `true`.
-* `ssl_check_certificate_date` - **(Optional, bool)** Indicates if the task should check the SSL certificate date. Defaults to `true`.
-* `ssl_check_certificate_revocation` - **(Optional, bool)** Indicates if the task should check the SSL certificate revocation. Defaults to `true`.
-* `ssl_check_certificate_usage` - **(Optional, bool)** Indicates if the task should check the SSL certificate usage. Defaults to `true`.
+* `full_page_download` - **(Optional, bool)** Indicates if the task should download the full web page.
+* `download_html` - **(Optional, bool)** Indicates if the task should download HTML.
+* `download_frames` - **(Optional, bool)** Indicates if the task should download frames.
+* `download_style_sheets` - **(Optional, bool)** Indicates if the task should download style sheets.
+* `download_scripts` - **(Optional, bool)** Indicates if the task should download scripts.
+* `download_images` - **(Optional, bool)** Indicates if the task should download images.
+* `download_objects` - **(Optional, bool)** Indicates if the task should download objects.
+* `download_applets` - **(Optional, bool)** Indicates if the task should download applets.
+* `download_additional` - **(Optional, bool)** Indicates if the task should download additional content.
+* `ssl_check_certificate_authority` - **(Optional, bool)** Indicates if the task should check the SSL certificate authority.
+* `ssl_check_certificate_cn` - **(Optional, bool)** Indicates if the task should check the SSL certificate CN.
+* `ssl_check_certificate_date` - **(Optional, bool)** Indicates if the task should check the SSL certificate date.
+* `ssl_check_certificate_revocation` - **(Optional, bool)** Indicates if the task should check the SSL certificate revocation.
+* `ssl_check_certificate_usage` - **(Optional, bool)** Indicates if the task should check the SSL certificate usage.
 * `ssl_expiration_reminder_in_days` - **(Optional, int)** Sends an expiration alert X number of days prior to certificate expiration. Defaults to 0, meaning no expiration alert.
 * `ssl_client_certificate` - **(Optional, string)** The name of the client certificate needed to access the site.
 * `get_params` **(Optional, list{object})** Configuration block for GET request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `post_params`.
@@ -73,7 +73,7 @@ resource "dotcommonitor_device" "example" {
 * `dns_server_ip` **(Optional, string)** The IP of a DNS server to use for the task.
 * `custom_dns_hosts` **(Optional, list{object})** Configuration block for a custom DNS host. Can be specified multiple times for each custom DNS host. Each block supports the fields documented below.
 * `task_type_id` **(Optional, int)** The ID of the task type to use for the task. See [ServerView documentation](https://wiki.dotcom-monitor.com/knowledge-base/serverview/) for valid task type ID's. Defaults to 2 (which is, HTTPS).
-* `timeout` **(Optional, int)** The timeout value to use for the task, in seconds. Defaults to 120.
+* `timeout` **(Optional, int)** The timeout value to use for the task, in seconds.
 
 ### get_params
 * `name` **(Required, string)** The name of the param.

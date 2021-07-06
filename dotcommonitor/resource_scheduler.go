@@ -1,8 +1,6 @@
 package dotcommonitor
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"fmt"
 	"log"
 	"strconv"
@@ -44,7 +42,6 @@ func resourceScheduler() *schema.Resource {
 						"from_minute": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							Default:      0,
 							ValidateFunc: validation.IntBetween(0, 1439),
 						},
 						"to_minute": {
@@ -56,7 +53,6 @@ func resourceScheduler() *schema.Resource {
 						"enabled": {
 							Type:     schema.TypeBool,
 							Optional: true,
-							Default:  true,
 						},
 					},
 				},
@@ -129,19 +125,31 @@ func resourceSchedulerRead(d *schema.ResourceData, meta interface{}) error {
 	// Pull scheduler ID from state
 	schedulerID, _ := strconv.Atoi(d.Id())
 
-	// Check if scheduler exists before trying to read it
-	if !doesSchedulerExist(schedulerID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Scheduler does not exist, removing ID %v from state", schedulerID)
-		d.SetId("")
-		return nil
-	}
-
 	scheduler := &client.Scheduler{}
+	scheduler.ID = schedulerID
+
 	api := meta.(*client.APIClient)
 	err := api.GetScheduler(scheduler)
 
 	if err != nil {
 		return fmt.Errorf("[Dotcom-Monitor] Failed to get scheduler: %s", err)
+	}
+
+	// Check if scheduler exists before trying to read it
+	if !(scheduler.ID > 0) {
+		log.Printf("[Dotcom-Monitor] [WARNING] Scheduler does not exist, removing ID %v from state", scheduler.ID)
+		d.SetId("")
+		return nil
+	}
+
+	// set state to detect drift
+	d.Set("name", scheduler.Name)
+	d.Set("description", scheduler.Description)
+	if scheduler.WeeklyIntervals != nil {
+		d.Set("weekly_intervals", scheduler.WeeklyIntervals)
+	}
+	if scheduler.ExcludedTimeIntervals != nil {
+		d.Set("excluded_time_intervals", scheduler.ExcludedTimeIntervals)
 	}
 
 	return nil
@@ -153,13 +161,6 @@ func resourceSchedulerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	// Pull scheduler ID from state
 	schedulerID, _ := strconv.Atoi(d.Id())
-
-	// Check if scheduler exists before trying to remove it
-	if !doesSchedulerExist(schedulerID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Scheduler does not exist, removing ID %v from state", schedulerID)
-		d.SetId("")
-		return nil
-	}
 
 	scheduler := &client.Scheduler{
 		ID:                    schedulerID,
@@ -201,13 +202,6 @@ func resourceSchedulerDelete(d *schema.ResourceData, meta interface{}) error {
 	// Pull scheduler ID from state
 	schedulerID, _ := strconv.Atoi(d.Id())
 
-	// Check if scheduler exists before trying to remove it
-	if !doesSchedulerExist(schedulerID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Scheduler does not exist, removing ID %v from state", schedulerID)
-		d.SetId("")
-		return nil
-	}
-
 	scheduler := &client.Scheduler{
 		ID: schedulerID,
 	}
@@ -219,40 +213,7 @@ func resourceSchedulerDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[Dotcom-Monitor] Failed to delete scheduler: %s", err)
 	}
 
+	d.SetId("")
+
 	return nil
-}
-
-// doesSchedulerExist ... determintes if a scheduler with the given schedulerID exists
-func doesSchedulerExist(schedulerID int, meta interface{}) bool {
-	log.Printf("[Dotcom-Monitor] [DEBUG] Checking if scheduler exists with ID: %v", schedulerID)
-	scheduler := &client.Scheduler{
-		ID: schedulerID,
-	}
-
-	// Since an empty HTTP response is a valid 200 from the API, we will determine if
-	//  the scheduler exists by comparing the hash of the struct before and after the HTTP call.
-	//  If the has does not change, it means nothing else was added, therefore it does not exist.
-	//  If the hash changes, the API found the scheduler and added the rest of the fields.
-	h := sha256.New()
-	t := fmt.Sprintf("%v", scheduler)
-	sum := h.Sum([]byte(t))
-	log.Printf("[Dotcom-Monitor] [DEBUG] Hash before: %x", sum)
-
-	// Try to get scheduler from API
-	api := meta.(*client.APIClient)
-	err := api.GetScheduler(scheduler)
-
-	t2 := fmt.Sprintf("%v", scheduler)
-	sum2 := h.Sum([]byte(t2))
-	log.Printf("[Dotcom-Monitor] [DEBUG] Hash after: %x", sum2)
-
-	// Compare the hashes, and if there was an error from the API we will assume the scheduler exists
-	//  to be safe that we do not improperly remove an existing scheduler from state
-	if bytes.Equal(sum, sum2) && err == nil {
-		log.Println("[Dotcom-Monitor] [DEBUG] No new fields added to the scheduler, therefore the scheduler did not exist")
-		return false
-	}
-
-	// If we get here, we can assume the scheduler does exist
-	return true
 }

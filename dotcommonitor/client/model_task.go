@@ -31,7 +31,7 @@ type Task struct {
 	HeaderParams                  []TaskParam `json:"HeaderParams,omitempty"`
 	PrepareScript                 string      `json:"PrepareScript,omitempty"`
 	DNSResolveMode                string      `json:"DNSResolveMode,omitempty"`
-	DNSserverIP                   string      `json:"DNSserverIP,omitempty"`
+	DNSserverIP                   string      `json:"DNSserverIP,omitempty"` // Yes, the 'S' in server is lowercase in the API :(
 	CustomDNSHosts                string      `json:"CustomDNSHosts,omitempty"`
 	DeviceID                      int         `json:"Device_Id"`
 	TaskTypeID                    int         `json:"Task_Type_Id"`
