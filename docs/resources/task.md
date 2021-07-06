@@ -13,27 +13,23 @@ resource "dotcommonitor_task" "example" {
   url          = "https://www.google.com"
   name         = "example-task"
   
-  get_params = [
-    {
-      name  = "paramname1"
-      value = "paramvalue1"
-    },
-    {
-      name  = "paramname2"
-      value = "paramvalue2"
-    }
-  ]
+  get_params {
+    name  = "paramname1"
+    value = "paramvalue1"
+  }
+  get_params {
+    name  = "paramname2"
+    value = "paramvalue2"
+  }
 
-  custom_dns_hosts = [
-    {
-      ip_address = "1.1.1.1"
-      host       = "myhost"
-    },
-    {
-      ip_address = "2.2.2.2"
-      host       = "myhost2"
-    }
-  ]
+  custom_dns_hosts {
+    ip_address = "1.1.1.1"
+    host       = "myhost"
+  }
+  custom_dns_hosts {
+    ip_address = "2.2.2.2"
+    host       = "myhost2"
+  }
 }
 
 resource "dotcommonitor_device" "example" {
@@ -69,13 +65,13 @@ resource "dotcommonitor_device" "example" {
 * `ssl_check_certificate_usage` - **(Optional, bool)** Indicates if the task should check the SSL certificate usage. Defaults to `true`.
 * `ssl_expiration_reminder_in_days` - **(Optional, int)** Sends an expiration alert X number of days prior to certificate expiration. Defaults to 0, meaning no expiration alert.
 * `ssl_client_certificate` - **(Optional, string)** The name of the client certificate needed to access the site.
-* `get_params` **(Optional, map{string})** The map of params for a GET request. Conflicts with `post_params`. Defined below.
-* `post_params` **(Optional, map{string})** The map of params for a POST request. Conflicts with `get_params`. Defined below.
-* `headers_params` **(Optional, map{string})** The map of headers for the request. Defined below.
+* `get_params` **(Optional, list{object})** Configuration block for GET request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `post_params`.
+* `post_params` **(Optional, list{object})** Configuration block for POST request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `get_params`.
+* `headers_params` **(Optional, list{object})** Configuration block for request header parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below.
 * `prepare_script` **(Optional, string)** The script contents to execute.
 * `dns_resolve_mode` **(Optional, string)** The DNS resolve mode of the task. Can be one of "Device Cached", "Non Cached", "TTL Cached", "External DNS Server".
 * `dns_server_ip` **(Optional, string)** The IP of a DNS server to use for the task.
-* `custom_dns_hosts` **(Optional, map{string})** The custom DNS hosts for the task. Defined below.
+* `custom_dns_hosts` **(Optional, list{object})** Configuration block for a custom DNS host. Can be specified multiple times for each custom DNS host. Each block supports the fields documented below.
 * `task_type_id` **(Optional, int)** The ID of the task type to use for the task. See [ServerView documentation](https://wiki.dotcom-monitor.com/knowledge-base/serverview/) for valid task type ID's. Defaults to 2 (which is, HTTPS).
 * `timeout` **(Optional, int)** The timeout value to use for the task, in seconds. Defaults to 120.
 
