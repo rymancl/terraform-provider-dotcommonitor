@@ -23,7 +23,7 @@ resource "dotcommonitor_task" "example" {
 
 ## Argument Reference
 * `name` - **(Required, string)** The exact name of the device.
-* `platform_id` - **(Optional, string)** The platform ID of the device. Can be one of 1 (ServerView, the default), 3 (MetricsView), 7 (BrowserView), 12 (WebView). Defaults to 1.
+* `platform_id` - **(Optional, string)** The platform ID of the device. Can be one of 1 (ServerView), 3 (MetricsView), 7 (BrowserView). Defaults to 1.
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:

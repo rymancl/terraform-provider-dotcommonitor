@@ -28,4 +28,4 @@ resource "dotcommonitor_device" "example" {
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:
 
-* All attributes from the [dotcommonitor_task resource](../resources/task.md), if not null.
+* `id` - The ID of the task.

@@ -1,8 +1,6 @@
 package dotcommonitor
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"fmt"
 	"log"
 	"strconv"
@@ -30,50 +28,44 @@ func resourceDevice() *schema.Resource {
 			"platform_id": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      1,                                         // ServerView
-				ValidateFunc: validation.IntInSlice([]int{1, 3, 7, 12}), // 1=ServerView, 3=MetricsView, 7=BrowserView, 12=WebView
+				Default:      1,
+				ValidateFunc: validation.IntInSlice([]int{1, 3, 7}), // 1=ServerView, 3=MetricsView, 7=BrowserView
 			},
 			"frequency": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      300,                                                                                 // 5 minutes
+				Default:      300,
 				ValidateFunc: validation.IntInSlice([]int{60, 180, 300, 600, 900, 1800, 2700, 3600, 7200, 10800}), // in seconds
 			},
 			"locations": {
-				Type:         schema.TypeList,
-				Optional:     true,
-				Elem: 		  &schema.Schema{Type: schema.TypeInt},
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 			"avoid_simultaneous_checks": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"alert_silence_min": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      0,
 				ValidateFunc: validation.IntAtLeast(0),
 			},
 			"false_positive_check": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 			"send_uptime_alert": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 			"postpone": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"owner_device_id": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      0,
 				ValidateFunc: validation.IntAtLeast(0),
 			},
 			"filter_id": {
@@ -83,7 +75,6 @@ func resourceDevice() *schema.Resource {
 			"scheduler_id": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      0,
 				ValidateFunc: validation.IntAtLeast(0),
 			},
 			"notifications_group": {
@@ -99,7 +90,6 @@ func resourceDevice() *schema.Resource {
 						"time_shift_min": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							Default:      0,
 							ValidateFunc: validation.IntInSlice([]int{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180}), // 0=immediate ... 10 mins - 3 hours
 						},
 					},
@@ -160,14 +150,8 @@ func resourceDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	// Pull device ID from state
 	deviceID, _ := strconv.Atoi(d.Id())
 
-	// Check if device exists before trying to read it
-	if !doesDeviceExist(deviceID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Device does not exist, removing ID %v from state", deviceID)
-		d.SetId("")
-		return nil
-	}
-
 	device := &client.Device{}
+	device.ID = deviceID
 
 	api := meta.(*client.APIClient)
 	err := api.GetDevice(device)
@@ -176,21 +160,40 @@ func resourceDeviceRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[Dotcom-Monitor] Failed to get device: %s", err)
 	}
 
+	// Check if device exists before trying to read it
+	if !(device.ID > 0) {
+		log.Printf("[Dotcom-Monitor] [WARNING] Device does not exist, removing ID %v from state", device.ID)
+		d.SetId("")
+		return nil
+	}
+
+	// set state to detect drift
+	d.Set("name", device.Name)
+	d.Set("platform_id", device.PlatformID)
+	d.Set("frequency", device.Frequency)
+	d.Set("locations", device.Locations)
+	d.Set("avoid_simultaneous_checks", device.AvoidSimultaneousChecks)
+	d.Set("alert_silence_min", device.AlertSilenceMin)
+	d.Set("false_positive_check", device.FalsePositiveCheck)
+	d.Set("send_uptime_alert", device.SendUptimeAlert)
+	d.Set("postpone", device.Postpone)
+	d.Set("owner_device_id", device.OwnerDeviceID)
+	d.Set("filter_id", device.FilterID)
+	d.Set("scheduler_id", device.SchedulerID)
+
+	if device.Notifications != nil && device.Notifications.NotificationGroups != nil {
+		d.Set("notifications_group", device.Notifications.NotificationGroups)
+	}
+
 	return nil
 }
 
 func resourceDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 	mutex.Lock()
+	d.Partial(true)
 
 	// Pull device ID from state
 	deviceID, _ := strconv.Atoi(d.Id())
-
-	// Check if device exists before trying to update it
-	if !doesDeviceExist(deviceID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Device does not exist, removing ID %v from state", deviceID)
-		d.SetId("")
-		return nil
-	}
 
 	notifications := &client.DeviceNotificationsBlock{
 		NotificationGroups: constructNotificationsNotificationGroupList(d.Get("notifications_group").([]interface{})),
@@ -226,6 +229,7 @@ func resourceDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[Dotcom-Monitor] Device ID: %v successfully updated", fmt.Sprint(device.ID))
 
 	mutex.Unlock()
+	d.Partial(false)
 	return resourceDeviceRead(d, meta)
 }
 
@@ -235,13 +239,6 @@ func resourceDeviceDelete(d *schema.ResourceData, meta interface{}) error {
 
 	// Pull device ID from state
 	deviceID, _ := strconv.Atoi(d.Id())
-
-	// Check if device exists before trying to remove it
-	if !doesDeviceExist(deviceID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Device does not exist, removing ID %v from state", deviceID)
-		d.SetId("")
-		return nil
-	}
 
 	device := &client.Device{
 		ID: deviceID,
@@ -254,40 +251,7 @@ func resourceDeviceDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[Dotcom-Monitor] Failed to delete device: %s", err)
 	}
 
+	d.SetId("")
+
 	return nil
-}
-
-// doesDeviceExist ... determintes if a device with the given deviceID exists
-func doesDeviceExist(deviceID int, meta interface{}) bool {
-	log.Printf("[Dotcom-Monitor] [DEBUG] Checking if device exists with ID: %v", deviceID)
-	device := &client.Device{
-		ID: deviceID,
-	}
-
-	// Since an empty HTTP response is a valid 200 from the API, we will determine if
-	//  the device exists by comparing the hash of the struct before and after the HTTP call.
-	//  If the has does not change, it means nothing else was added, therefore it does not exist.
-	//  If the hash changes, the API found the device and added the rest of the fields.
-	h := sha256.New()
-	t := fmt.Sprintf("%v", device)
-	sum := h.Sum([]byte(t))
-	log.Printf("[Dotcom-Monitor] [DEBUG] Hash before: %x", sum)
-
-	// Try to get device from API
-	api := meta.(*client.APIClient)
-	err := api.GetDevice(device)
-
-	t2 := fmt.Sprintf("%v", device)
-	sum2 := h.Sum([]byte(t2))
-	log.Printf("[Dotcom-Monitor] [DEBUG] Hash after: %x", sum2)
-
-	// Compare the hashes, and if there was an error from the API we will assume the device exists
-	//  to be safe that we do not improperly remove an existing device from state
-	if bytes.Equal(sum, sum2) && err == nil {
-		log.Println("[Dotcom-Monitor] [DEBUG] No new fields added to the device, therefore the device did not exist")
-		return false
-	}
-
-	// If we get here, we can assume the device does exist
-	return true
 }

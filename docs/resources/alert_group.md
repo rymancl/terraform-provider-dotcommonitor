@@ -36,7 +36,7 @@ resource "dotcommonitor_group" "example" {
 ## Argument Reference
 * `name` - **(Required, string)** The name of the alert group.
 * `scheduler_id` - **(Optional, int)** The valid scheduler ID to use for the group.
-* `addresses` - **(Optional, object)** Configuration block for an address. Can be specified multiple times for each address. Each block supports the fields documented below.
+* `addresses` - **(Optional, list{object})** Configuration block for an address. Can be specified multiple times for each address. Each block supports the fields documented below.
 
 ### addresses
 * `type` - **(Required, string)** The type of address. Can be one of "Email", "Phone", "Pager", "Sms", "PagerDuty".
@@ -57,5 +57,5 @@ In addition to all arguments above, the following attributes are exported:
 `dotcommonitor_group` can be imported using the ID of the alert group, e.g.
 
 ```
-$ terraform import dotcommonitor_group.example alertgroup12345
+$ terraform import dotcommonitor_group.example 12345
 ```

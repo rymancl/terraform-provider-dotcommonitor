@@ -19,5 +19,5 @@ data "dotcommonitor_scheduler" "example" {
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:
 
-* All attributes from the [dotcommonitor_scheduler resource](../resources/scheduler.md), if not null.
+* _N/A_
 

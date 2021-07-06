@@ -28,46 +28,9 @@ func NewAPIClient() *APIClient {
 func (c *APIClient) CreateTask(task *Task) error {
 	apiPath := "tasks"
 
-	data := &Task{
-		RequestType:                   task.RequestType,
-		URL:                           task.URL,
-		DeviceID:                      task.DeviceID,
-		TaskTypeID:                    task.TaskTypeID,
-		Name:                          task.Name,
-		Keyword1:                      task.Keyword1,
-		Keyword2:                      task.Keyword2,
-		Keyword3:                      task.Keyword3,
-		UserName:                      task.UserName,
-		UserPass:                      task.UserPass,
-		SSLCheckCertificateAuthority:  task.SSLCheckCertificateAuthority,
-		SSLCheckCertificateCN:         task.SSLCheckCertificateCN,
-		SSLCheckCertificateDate:       task.SSLCheckCertificateDate,
-		SSLCheckCertificateRevocation: task.SSLCheckCertificateRevocation,
-		SSLCheckCertificateUsage:      task.SSLCheckCertificateUsage,
-		SSLExpirationReminderInDays:   task.SSLExpirationReminderInDays,
-		SSLClientCertificate:          task.SSLClientCertificate,
-		FullPageDownload:              task.FullPageDownload,
-		DownloadHTML:                  task.DownloadHTML,
-		DownloadFrames:                task.DownloadFrames,
-		DownloadStyleSheets:           task.DownloadStyleSheets,
-		DownloadScripts:               task.DownloadScripts,
-		DownloadImages:                task.DownloadImages,
-		DownloadObjects:               task.DownloadObjects,
-		DownloadApplets:               task.DownloadApplets,
-		DownloadAdditional:            task.DownloadAdditional,
-		GetParams:                     task.GetParams,
-		PostParams:                    task.PostParams,
-		HeaderParams:                  task.HeaderParams,
-		Timeout:                       task.Timeout,
-		PrepareScript:                 task.PrepareScript,
-		DNSResolveMode:                task.DNSResolveMode,
-		DNSserverIP:                   task.DNSserverIP,
-		CustomDNSHosts:                task.CustomDNSHosts,
-	}
-
 	var resp CreateTaskResponseBlock
 
-	if err := c.Do("PUT", apiPath, data, &resp); err != nil {
+	if err := c.Do("PUT", apiPath, task, &resp); err != nil {
 		return fmt.Errorf("Failed to create task: %s", err)
 	}
 
@@ -80,47 +43,11 @@ func (c *APIClient) CreateTask(task *Task) error {
 // https://wiki.dotcom-monitor.com/knowledge-base/get-task-info/
 func (c *APIClient) GetTask(task *Task) error {
 	apiPath := fmt.Sprintf("task/%s", fmt.Sprint(task.ID))
+	task.ID = 0 // reset ID for provider checks
 
-	var resp Task
-
-	if err := c.Do("GET", apiPath, nil, &resp); err != nil {
+	if err := c.Do("GET", apiPath, nil, &task); err != nil {
 		return fmt.Errorf("Failed to get task: %s", err)
 	}
-
-	task.RequestType = resp.RequestType
-	task.URL = resp.URL
-	task.Keyword1 = resp.Keyword1
-	task.Keyword2 = resp.Keyword2
-	task.Keyword3 = resp.Keyword3
-	task.UserName = resp.UserName
-	task.UserPass = resp.UserPass
-	task.SSLCheckCertificateAuthority = resp.SSLCheckCertificateAuthority
-	task.SSLCheckCertificateCN = resp.SSLCheckCertificateCN
-	task.SSLCheckCertificateDate = resp.SSLCheckCertificateDate
-	task.SSLCheckCertificateRevocation = resp.SSLCheckCertificateRevocation
-	task.SSLCheckCertificateUsage = resp.SSLCheckCertificateUsage
-	task.SSLExpirationReminderInDays = resp.SSLExpirationReminderInDays
-	task.SSLClientCertificate = resp.SSLClientCertificate
-	task.FullPageDownload = resp.FullPageDownload
-	task.DownloadHTML = resp.DownloadHTML
-	task.DownloadFrames = resp.DownloadFrames
-	task.DownloadStyleSheets = resp.DownloadStyleSheets
-	task.DownloadScripts = resp.DownloadScripts
-	task.DownloadImages = resp.DownloadImages
-	task.DownloadObjects = resp.DownloadObjects
-	task.DownloadApplets = resp.DownloadApplets
-	task.DownloadAdditional = resp.DownloadAdditional
-	task.GetParams = resp.GetParams
-	task.PostParams = resp.PostParams
-	task.HeaderParams = resp.HeaderParams
-	task.PrepareScript = resp.PrepareScript
-	task.DNSResolveMode = resp.DNSResolveMode
-	task.DNSserverIP = resp.DNSserverIP
-	task.CustomDNSHosts = resp.CustomDNSHosts
-	task.DeviceID = resp.DeviceID
-	task.TaskTypeID = resp.TaskTypeID
-	task.Name = resp.Name
-	task.Timeout = resp.Timeout
 
 	return nil
 }
@@ -172,46 +99,9 @@ func (c *APIClient) GetDeviceTasksByName(deviceID int, name string, tasks *[]Tas
 func (c *APIClient) UpdateTask(task *Task) error {
 	apiPath := fmt.Sprintf("task/%s", fmt.Sprint(task.ID))
 
-	data := &Task{
-		RequestType:                   task.RequestType,
-		URL:                           task.URL,
-		DeviceID:                      task.DeviceID,
-		TaskTypeID:                    task.TaskTypeID,
-		Name:                          task.Name,
-		Keyword1:                      task.Keyword1,
-		Keyword2:                      task.Keyword2,
-		Keyword3:                      task.Keyword3,
-		UserName:                      task.UserName,
-		UserPass:                      task.UserPass,
-		SSLCheckCertificateAuthority:  task.SSLCheckCertificateAuthority,
-		SSLCheckCertificateCN:         task.SSLCheckCertificateCN,
-		SSLCheckCertificateDate:       task.SSLCheckCertificateDate,
-		SSLCheckCertificateRevocation: task.SSLCheckCertificateRevocation,
-		SSLCheckCertificateUsage:      task.SSLCheckCertificateUsage,
-		SSLExpirationReminderInDays:   task.SSLExpirationReminderInDays,
-		SSLClientCertificate:          task.SSLClientCertificate,
-		FullPageDownload:              task.FullPageDownload,
-		DownloadHTML:                  task.DownloadHTML,
-		DownloadFrames:                task.DownloadFrames,
-		DownloadStyleSheets:           task.DownloadStyleSheets,
-		DownloadScripts:               task.DownloadScripts,
-		DownloadImages:                task.DownloadImages,
-		DownloadObjects:               task.DownloadObjects,
-		DownloadApplets:               task.DownloadApplets,
-		DownloadAdditional:            task.DownloadAdditional,
-		GetParams:                     task.GetParams,
-		PostParams:                    task.PostParams,
-		HeaderParams:                  task.HeaderParams,
-		Timeout:                       task.Timeout,
-		PrepareScript:                 task.PrepareScript,
-		DNSResolveMode:                task.DNSResolveMode,
-		DNSserverIP:                   task.DNSserverIP,
-		CustomDNSHosts:                task.CustomDNSHosts,
-	}
-
 	var resp UpdateTaskResponseBlock
 
-	if err := c.Do("POST", apiPath, data, &resp); err != nil {
+	if err := c.Do("POST", apiPath, task, &resp); err != nil {
 		return fmt.Errorf("Failed to update task: %s", err)
 	}
 
@@ -241,25 +131,9 @@ func (c *APIClient) DeleteTask(task *Task) error {
 func (c *APIClient) CreateDevice(device *Device) error {
 	apiPath := "devices"
 
-	data := &Device{
-		Name:                    device.Name,
-		PlatformID:              device.PlatformID,
-		Frequency:               device.Frequency,
-		Locations:               device.Locations,
-		AvoidSimultaneousChecks: device.AvoidSimultaneousChecks,
-		AlertSilenceMin:         device.AlertSilenceMin,
-		FalsePositiveCheck:      device.FalsePositiveCheck,
-		SendUptimeAlert:         device.SendUptimeAlert,
-		Postpone:                device.Postpone,
-		OwnerDeviceID:           device.OwnerDeviceID,
-		FilterID:                device.FilterID,
-		SchedulerID:             device.SchedulerID,
-		Notifications:           device.Notifications,
-	}
-
 	var resp CreateDeviceResponseBlock
 
-	if err := c.Do("PUT", apiPath, data, &resp); err != nil {
+	if err := c.Do("PUT", apiPath, device, &resp); err != nil {
 		return fmt.Errorf("Failed to create device: %s", err)
 	}
 
@@ -272,29 +146,11 @@ func (c *APIClient) CreateDevice(device *Device) error {
 // https://wiki.dotcom-monitor.com/knowledge-base/get-device-info/
 func (c *APIClient) GetDevice(device *Device) error {
 	apiPath := fmt.Sprintf("device/%s", fmt.Sprint(device.ID))
+	device.ID = 0 // reset ID for provider checks
 
-	var resp Device
-
-	if err := c.Do("GET", apiPath, nil, &resp); err != nil {
+	if err := c.Do("GET", apiPath, nil, &device); err != nil {
 		return fmt.Errorf("Failed to get device with ID %v: %s", device.ID, err)
 	}
-
-	device.Name = resp.Name
-	device.PlatformID = resp.PlatformID
-	device.Frequency = resp.Frequency
-	device.Locations = resp.Locations
-	device.AvoidSimultaneousChecks = resp.AvoidSimultaneousChecks
-	device.AlertSilenceMin = resp.AlertSilenceMin
-	device.FalsePositiveCheck = resp.FalsePositiveCheck
-	device.SendUptimeAlert = resp.SendUptimeAlert
-	device.StatusDescription = resp.StatusDescription
-	device.Postpone = resp.Postpone
-	device.OwnerDeviceID = resp.OwnerDeviceID
-	device.FilterID = resp.FilterID
-	device.SchedulerID = resp.SchedulerID
-	device.NumberOfTasks = resp.NumberOfTasks
-	device.PackageID = resp.PackageID
-	device.Notifications = resp.Notifications
 
 	return nil
 }
@@ -304,25 +160,9 @@ func (c *APIClient) GetDevice(device *Device) error {
 func (c *APIClient) UpdateDevice(device *Device) error {
 	apiPath := fmt.Sprintf("device/%s", fmt.Sprint(device.ID))
 
-	data := &Device{
-		Name:                    device.Name,
-		PlatformID:              device.PlatformID,
-		Frequency:               device.Frequency,
-		Locations:               device.Locations,
-		AvoidSimultaneousChecks: device.AvoidSimultaneousChecks,
-		AlertSilenceMin:         device.AlertSilenceMin,
-		FalsePositiveCheck:      device.FalsePositiveCheck,
-		SendUptimeAlert:         device.SendUptimeAlert,
-		Postpone:                device.Postpone,
-		OwnerDeviceID:           device.OwnerDeviceID,
-		FilterID:                device.FilterID,
-		SchedulerID:             device.SchedulerID,
-		Notifications:           device.Notifications,
-	}
-
 	var resp UpdateDeviceResponseBlock
 
-	if err := c.Do("POST", apiPath, data, &resp); err != nil {
+	if err := c.Do("POST", apiPath, device, &resp); err != nil {
 		return fmt.Errorf("Failed to update device: %s", err)
 	}
 
@@ -347,15 +187,11 @@ func (c *APIClient) DeleteDevice(device *Device) error {
 func (c *APIClient) GetDevicesByName(platformID int, name string, devices *[]Device) error {
 	deviceIdsAPIPath := fmt.Sprintf("devices/%s", fmt.Sprint(platformID))
 
-	//var resp PlatformDevices
 	var platformDevicesResp []int
 
 	if err := c.Do("GET", deviceIdsAPIPath, nil, &platformDevicesResp); err != nil {
 		return fmt.Errorf("Failed to get device ID's by platform ID: %s", err)
 	}
-
-	//deviceList := make([]*Device, len(platformDevicesResp))
-	//client := NewAPIClient()
 
 	for _, item := range platformDevicesResp {
 		device := &Device{}
@@ -367,13 +203,9 @@ func (c *APIClient) GetDevicesByName(platformID int, name string, devices *[]Dev
 		// check if the resulting device is the one we're looking for by name
 		//   if it is, add it to our results list
 		if device.Name == name {
-			//devices[i] = device
 			*devices = append(*devices, *device)
 		}
-		//device = nil
 	}
-
-	//return fmt.Errorf("***** devices length: %v", len(devices))
 
 	return nil
 }
@@ -387,16 +219,9 @@ func (c *APIClient) GetDevicesByName(platformID int, name string, devices *[]Dev
 func (c *APIClient) CreateGroup(group *Group) error {
 	apiPath := "groups"
 
-	data := &Group{
-		Name:        group.Name,
-		SchedulerID: group.SchedulerID,
-		Addresses:   group.Addresses,
-		AssignedTo:  group.AssignedTo,
-	}
-
 	var resp CreateGroupResponseBlock
 
-	if err := c.Do("PUT", apiPath, data, &resp); err != nil {
+	if err := c.Do("PUT", apiPath, group, &resp); err != nil {
 		return fmt.Errorf("Failed to create group: %s", err)
 	}
 
@@ -409,17 +234,11 @@ func (c *APIClient) CreateGroup(group *Group) error {
 // https://wiki.dotcom-monitor.com/knowledge-base/get-notification-group-info/
 func (c *APIClient) GetGroup(group *Group) error {
 	apiPath := fmt.Sprintf("group/%s", fmt.Sprint(group.ID))
+	group.ID = 0 // reset ID for provider checks
 
-	var resp Group
-
-	if err := c.Do("GET", apiPath, nil, &resp); err != nil {
+	if err := c.Do("GET", apiPath, nil, &group); err != nil {
 		return fmt.Errorf("Failed to get group: %s", err)
 	}
-
-	group.Name = resp.Name
-	group.SchedulerID = resp.SchedulerID
-	group.Addresses = resp.Addresses
-	group.AssignedTo = resp.AssignedTo
 
 	return nil
 }
@@ -429,16 +248,9 @@ func (c *APIClient) GetGroup(group *Group) error {
 func (c *APIClient) UpdateGroup(group *Group) error {
 	apiPath := fmt.Sprintf("group/%s", fmt.Sprint(group.ID))
 
-	data := &Group{
-		Name:        group.Name,
-		SchedulerID: group.SchedulerID,
-		Addresses:   group.Addresses,
-		AssignedTo:  group.AssignedTo,
-	}
-
 	var resp UpdateGroupResponseBlock
 
-	if err := c.Do("POST", apiPath, data, &resp); err != nil {
+	if err := c.Do("POST", apiPath, group, &resp); err != nil {
 		return fmt.Errorf("Failed to update group: %s", err)
 	}
 
@@ -500,9 +312,9 @@ func (c *APIClient) GetLocations(platformID int, includeUnavailable bool, locati
 		return fmt.Errorf("GetLocations failed: %s", err)
 	}
 
-	for _, item := range resp {	
-		if (!item.IsDeleted) {  // don't include deleted locations
-			if ((item.Available) || (!item.Available && includeUnavailable)) {
+	for _, item := range resp {
+		if !item.IsDeleted { // don't include deleted locations
+			if (item.Available) || (!item.Available && includeUnavailable) {
 				*locations = append(*locations, item)
 			}
 		}
@@ -520,7 +332,7 @@ func (c *APIClient) GetLocation(platformID int, locationID int, location *Locati
 	}
 
 	for _, item := range locationsList {
-		if (item.ID == locationID) {
+		if item.ID == locationID {
 			*location = item
 			return nil
 		}
@@ -538,7 +350,7 @@ func (c *APIClient) GetLocationsByName(platformID int, name string, includeUnava
 	}
 
 	for _, item := range locationsList {
-		if (item.Name == name) {
+		if item.Name == name {
 			*locations = append(*locations, item)
 		}
 	}
@@ -555,7 +367,7 @@ func (c *APIClient) GetPublicLocations(platformID int, includeUnavailable bool, 
 	}
 
 	for _, item := range locationsList {
-		if (!item.IsPrivate) {
+		if !item.IsPrivate {
 			*locations = append(*locations, item)
 		}
 	}
@@ -577,7 +389,7 @@ func (c *APIClient) GetPrivateLocations(platformID int, includeUnavailable bool,
 	}
 
 	for _, item := range locationsList {
-		if (item.IsPrivate) {
+		if item.IsPrivate {
 			*locations = append(*locations, item)
 		}
 	}
@@ -609,6 +421,7 @@ func (c *APIClient) CreateScheduler(scheduler *Scheduler) error {
 // https://www.dotcom-monitor.com/wiki/knowledge-base/get-specific-scheduler-info/
 func (c *APIClient) GetScheduler(scheduler *Scheduler) error {
 	apiPath := fmt.Sprintf("scheduler/%s", fmt.Sprint(scheduler.ID))
+	scheduler.ID = 0 // reset ID for provider checks
 
 	if err := c.Do("GET", apiPath, nil, &scheduler); err != nil {
 		return fmt.Errorf("Failed to get scheduler: %s", err)

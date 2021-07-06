@@ -86,9 +86,9 @@ func expandInterfaceListToTaskParamList(schemaInterfaceList []interface{}) []cli
 	return taskParamList
 }
 
-// constructCustomDNSHostsString ... returns a string required for the syntax of "CustomDNSHosts"
+// flattenCustomDnsHostsToString ... returns a string required for the syntax of "CustomDNSHosts"
 //  Syntax:  <host>=<ip>;
-func constructCustomDNSHostsString(hosts []interface{}) string {
+func flattenCustomDnsHostsToString(hosts []interface{}) string {
 	buf := bytes.Buffer{}
 
 	for _, item := range hosts {
@@ -103,7 +103,7 @@ func constructCustomDNSHostsString(hosts []interface{}) string {
 
 	}
 	resultString := buf.String()
-	log.Printf("[Dotcom-Monitor] [constructCustomDNSHostsString] Result string: %s", resultString)
+	log.Printf("[Dotcom-Monitor] [flattenCustomDnsHostsToString] Result string: %s", resultString)
 
 	return resultString
 }
