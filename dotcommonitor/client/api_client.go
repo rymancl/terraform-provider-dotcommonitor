@@ -500,9 +500,9 @@ func (c *APIClient) GetLocations(platformID int, includeUnavailable bool, locati
 		return fmt.Errorf("GetLocations failed: %s", err)
 	}
 
-	for _, item := range resp {
-		if !item.IsDeleted { // don't include deleted locations
-			if (item.Available) || (!item.Available && includeUnavailable) {
+	for _, item := range resp {	
+		if (!item.IsDeleted) {  // don't include deleted locations
+			if ((item.Available) || (!item.Available && includeUnavailable)) {
 				*locations = append(*locations, item)
 			}
 		}
@@ -520,7 +520,7 @@ func (c *APIClient) GetLocation(platformID int, locationID int, location *Locati
 	}
 
 	for _, item := range locationsList {
-		if item.ID == locationID {
+		if (item.ID == locationID) {
 			*location = item
 			return nil
 		}
@@ -538,7 +538,7 @@ func (c *APIClient) GetLocationsByName(platformID int, name string, includeUnava
 	}
 
 	for _, item := range locationsList {
-		if item.Name == name {
+		if (item.Name == name) {
 			*locations = append(*locations, item)
 		}
 	}
@@ -555,7 +555,7 @@ func (c *APIClient) GetPublicLocations(platformID int, includeUnavailable bool, 
 	}
 
 	for _, item := range locationsList {
-		if !item.IsPrivate {
+		if (!item.IsPrivate) {
 			*locations = append(*locations, item)
 		}
 	}
@@ -577,7 +577,7 @@ func (c *APIClient) GetPrivateLocations(platformID int, includeUnavailable bool,
 	}
 
 	for _, item := range locationsList {
-		if item.IsPrivate {
+		if (item.IsPrivate) {
 			*locations = append(*locations, item)
 		}
 	}
