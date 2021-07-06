@@ -62,3 +62,16 @@ func groupAddressCodeIsValid() schema.SchemaValidateFunc {
 		return
 	}
 }
+
+// detectInvalidSchedulerWeeklyIntervalDays ... detects if a day string is valid to the API
+//  See Weekly_Intervals: https://www.dotcom-monitor.com/wiki/knowledge-base/scheduler-operations/
+func detectInvalidSchedulerWeeklyIntervalDays(days []string) []string {
+	validDays := []string{"Su","Mo","Tu","We","Th","Fr","Sa"}
+	var invalidDays []string
+	for _, item := range days {
+		if !stringInList(validDays, item) {
+			invalidDays = append(invalidDays, item)
+		}
+	}
+	return invalidDays
+}
