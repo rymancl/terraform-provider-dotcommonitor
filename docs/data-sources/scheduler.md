@@ -5,8 +5,6 @@ subcategory: "Scheduler"
 # Data Source: dotcommonitor_scheduler
 Represents a Dotcom-Monitor scheduler
 
-!>Please note that this data source cannot be used if there exists more than one resource with the same name! The Dotcom-Monitor API supports `n` resources with the same name, but this becomes problematic when trying to target a specific resouce.
-
 ## Example usage
 ```hcl
 data "dotcommonitor_scheduler" "example" {
@@ -16,7 +14,7 @@ data "dotcommonitor_scheduler" "example" {
 
 ## Argument Reference
 * `id` - **(Optional, int)** The ID of the scheduler. Must provide exactly one of `id`, `name`.
-* `name` - **(Optional, string)** The exact name of the scheduler. Must provide exactly one of `id`, `name`.
+* `name` - **(Optional, string)** The exact name of the scheduler. This will fail if there exists more than one scheduler with the same name. Must provide exactly one of `id`, `name`.
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:

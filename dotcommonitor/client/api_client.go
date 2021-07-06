@@ -634,13 +634,6 @@ func (c *APIClient) GetSchedulers(schedulerIds *[]int) error {
 func (c *APIClient) UpdateScheduler(scheduler *Scheduler) error {
 	apiPath := fmt.Sprintf("scheduler/%s", fmt.Sprint(scheduler.ID))
 
-	// data := &Scheduler{
-	// 	Name:                  scheduler.Name,
-	// 	Description:           scheduler.Description,
-	// 	WeeklyIntervals:       scheduler.WeeklyIntervals,
-	// 	ExcludedTimeIntervals: scheduler.ExcludedTimeIntervals,
-	// }
-
 	var resp UpdateSchedulerResponseBlock
 
 	if err := c.Do("POST", apiPath, scheduler, &resp); err != nil {
