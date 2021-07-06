@@ -27,7 +27,7 @@ resource "dotcommonitor_device" "example" {
 * `owner_device_id` - **(Optional, int)** The valid device ID of the device that owns this device. Defaults to 0, meaning no owner.
 * `filter_id` - **(Optional, int)** The valid filter ID to use for the device. Defaults to 0.
 * `scheduler_id` - **(Optional, int)** The valid scheduler ID to use for the device. Defaults to 0.
-* `notifications_group` - **(Optional, map{string})** The map of groups to send notifications to. Note that groups can only be assigned to a device, you cannot assign a device to a group. Defined below.
+* `notifications_group` - **(Optional, object)** Configuration block for a notifications group. Can be specified multiple times for each notifications group. Note that groups can only be assigned to a device, you cannot assign a device to a group. Each block supports the fields documented below.
 
 ### locations
 Can be any combination of valid public or private location ID's. This argument can be used in combination with the [locations data source](https://registry.terraform.io/providers/rymancl/dotcommonitor/latest/docs/data-sources/locations) or defined by providing ID's manully.
