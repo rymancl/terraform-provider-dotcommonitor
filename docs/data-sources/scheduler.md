@@ -19,6 +19,5 @@ data "dotcommonitor_scheduler" "example" {
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:
 
-* `description` - The description of the scheduler.
-* `weekly_interval` - List of weekly interval schedules.
-* `excluded_time_interval` - List of excluded time interval schedules.
+* All attributes from the [dotcommonitor_scheduler resource](../resources/scheduler.md), if not null.
+
