@@ -165,7 +165,6 @@ func resourceTask() *schema.Resource {
 						},
 					},
 				},
-				ConfigMode:    schema.SchemaConfigModeAttr,
 				ConflictsWith: []string{"post_params"},
 			},
 			"post_params": {
@@ -185,7 +184,6 @@ func resourceTask() *schema.Resource {
 						},
 					},
 				},
-				ConfigMode:    schema.SchemaConfigModeAttr,
 				ConflictsWith: []string{"get_params"},
 			},
 			"header_params": {
@@ -205,7 +203,6 @@ func resourceTask() *schema.Resource {
 						},
 					},
 				},
-				ConfigMode: schema.SchemaConfigModeAttr,
 			},
 			"prepare_script": {
 				Type:     schema.TypeString,
@@ -239,7 +236,6 @@ func resourceTask() *schema.Resource {
 						},
 					},
 				},
-				ConfigMode: schema.SchemaConfigModeAttr,
 			},
 			"task_type_id": { // https://wiki.dotcom-monitor.com/knowledge-base/serverview/
 				Type:         schema.TypeInt,
