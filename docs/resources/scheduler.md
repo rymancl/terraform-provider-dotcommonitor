@@ -9,19 +9,19 @@ Represents a Dotcom-Monitor scheduler
 ```hcl
 resource "dotcommonitor_scheduler" "example" {
   name = "example-scheduler"
-  weekly_interval {
+  weekly_intervals {
     days        = ["Mo", "Tu"]
     from_minute = 5
     to_minute   = 90
     enabled     = true
   }
-  weekly_interval {
+  weekly_intervals {
     days        = ["Th"]
     from_minute = 30
     to_minute   = 60
     enabled     = false
   }
-  excluded_time_interval {
+  excluded_time_intervals {
     from_unix = 1358712000000
     to_unix   = 1358798400000
   } 
@@ -36,8 +36,8 @@ resource "dotcommonitor_device" "example" {
 ## Argument Reference
 * `name` - **(Required, string)** The name of the scheduler.
 * `description` - **(Optional, string)** The description of the scheduler.
-* `weekly_interval` - **(Optional, object)** Configuration block for a weekly interval schedule. Can be specified multiple times for each weekly interval. Each block supports the fields documented below.
-* `excluded_time_interval` - **(Optional, object)** Configuration block for an excluded time interval schedule. Can be specified multiple times for each excluded time interval. Each block supports the fields documented below.
+* `weekly_interval` - **(Optional, list{object})** Configuration block for a weekly interval schedule. Can be specified multiple times for each weekly interval. Each block supports the fields documented below.
+* `excluded_time_interval` - **(Optional, list{object})** Configuration block for an excluded time interval schedule. Can be specified multiple times for each excluded time interval. Each block supports the fields documented below.
 
 ### weekly_interval
 * `days` - **(Required, list{string})** The days the scheduler is active. Can be a list of any of "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa".
