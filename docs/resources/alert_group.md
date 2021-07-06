@@ -36,7 +36,7 @@ resource "dotcommonitor_group" "example" {
 ## Argument Reference
 * `name` - **(Required, string)** The name of the alert group.
 * `scheduler_id` - **(Optional, int)** The valid scheduler ID to use for the group.
-* `addresses` - **(Optional, map{string})** The map of addresses in the group. Defined below.
+* `addresses` - **(Optional, object)** Configuration block for an address. Can be specified multiple times for each address. Each block supports the fields documented below.
 
 ### addresses
 * `type` - **(Required, string)** The type of address. Can be one of "Email", "Phone", "Pager", "Sms", "PagerDuty".
