@@ -43,7 +43,7 @@ resource "dotcommonitor_device" "example" {
 * `days` - **(Required, list{string})** The days the scheduler is active. Can be a list of any of "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa".
 * `from_minute` - **(Optional, int)** The minute of the day when the scheduler becomes active. Can be any int between 0 and 1439. Defaults to 0.
 * `to_minute` - **(Optional, int)** The minute of the day when the scheduler turns inactive. Can be any int between 1 and 1440. Defaults to 1440.
-* `enabled` - **(Optional, bool)** Indicates if the scheduler is enabled. Defaults to `true`.
+* `enabled` - **(Optional, bool)** Indicates if the scheduler is enabled.
 
 ### excluded_time_interval
 * `from_unix` - **(Required, int)** The starting date/time during which monitoring should be excluded. Per the API, this must be a valid [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).

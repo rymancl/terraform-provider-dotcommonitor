@@ -15,18 +15,18 @@ resource "dotcommonitor_device" "example" {
 ```
 
 ## Argument Reference
-* `name` - **(Required, string)** The name of the device
-* `platform_id` - **(Optional, int)**  The ID of the platform of the device. See [Monitoring Platforms](https://wiki.dotcom-monitor.com/knowledge-base-category/monitoring-platforms/) for more info. Note that [UserView is not supported](https://wiki.dotcom-monitor.com/knowledge-base/get-device-list-by-platform/) by API v.1. Can be one of 1 (ServerView, the default), 3 (MetricsView), 7 (BrowserView). Defaults to 1.
+* `name` - **(Required, string)** The name of the device.
+* `platform_id` - **(Optional, int)**  The ID of the platform of the device. See [Monitoring Platforms](https://wiki.dotcom-monitor.com/knowledge-base-category/monitoring-platforms/) for more info. Note that [UserView is not supported](https://wiki.dotcom-monitor.com/knowledge-base/get-device-list-by-platform/) by API v.1. Can be one of 1 (ServerView), 3 (MetricsView), 7 (BrowserView). Defaults to 1.
 * `frequency` - **(Optional, int)** The frequency that that the device checks at, in seconds. Can be one of 60, 180, 300, 600, 900, 1800, 2700, 3600, 7200, 10800. Defaults to 300.
-* `locations` - **(Optional, list{int})** The list of location ID's for monitoring agents. Defined below.
-* `avoid_simultaneous_checks` - **(Optional, bool)** Indicates if the device should avoid simultaneous checks. Defaults to `false`.
-* `alert_silence_min` - **(Optional, int)** The length of time alerts should be silenced, in minutes. Defaults to 0.
-* `false_positive_check` - **(Optional, bool)** Indicates if the device should check for false positives (brief hiccup / network glitch). Dotcom-Monitor recommends having this enabled. Defaults to `true`.
-* `send_uptime_alert` - **(Optional, bool)** Indicates if uptime alerts should be sent when a device begins successfully completing tasks after a failure. Defaults to `true`.
-* `postpone` - **(Optional, bool)** Indicates if the device should be postponed/disabled. Defaults to `false`.
-* `owner_device_id` - **(Optional, int)** The valid device ID of the device that owns this device. Defaults to 0, meaning no owner.
-* `filter_id` - **(Optional, int)** The valid filter ID to use for the device. Defaults to 0.
-* `scheduler_id` - **(Optional, int)** The valid scheduler ID to use for the device. Defaults to 0.
+* `locations` - **(Optional, list{int})** The list of location ID's for monitoring agents. Defined below. Note that if you do not provide this argument upon creation, the API will assign all locations and drift will be detected on subsequent plans.
+* `avoid_simultaneous_checks` - **(Optional, bool)** Indicates if the device should avoid simultaneous checks.
+* `alert_silence_min` - **(Optional, int)** The length of time alerts should be silenced, in minutes.
+* `false_positive_check` - **(Optional, bool)** Indicates if the device should check for false positives (brief hiccup / network glitch). Dotcom-Monitor recommends having this enabled.
+* `send_uptime_alert` - **(Optional, bool)** Indicates if uptime alerts should be sent when a device begins successfully completing tasks after a failure.
+* `postpone` - **(Optional, bool)** Indicates if the device should be postponed/disabled.
+* `owner_device_id` - **(Optional, int)** The valid device ID of the device that owns this device.
+* `filter_id` - **(Optional, int)** The valid filter ID to use for the device.
+* `scheduler_id` - **(Optional, int)** The valid scheduler ID to use for the device.
 * `notifications_group` - **(Optional, object)** Configuration block for a notifications group. Can be specified multiple times for each notifications group. Note that groups can only be assigned to a device, you cannot assign a device to a group. Each block supports the fields documented below.
 
 ### locations
@@ -73,7 +73,7 @@ _(last updated: July 2021)_
 
 ### notifications_group
 * `id` - **(Required, int)** The ID of the alert group.
-* `time_shift_min` - **(Optional, int)** The escalation time for the alert, in minutes. Can be one of 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180. Defaults to 0, meaning immediate.
+* `time_shift_min` - **(Optional, int)** The escalation time for the alert, in minutes. Can be one of 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180.
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:

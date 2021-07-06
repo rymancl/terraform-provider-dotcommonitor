@@ -1,8 +1,6 @@
 package dotcommonitor
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"fmt"
 	"log"
 	"strconv"
@@ -27,6 +25,7 @@ func resourceTask() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "GET",
+				ForceNew:     true, // API gets confused on certain attributes when changing the request type
 				ValidateFunc: validation.StringInSlice([]string{"GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH"}, true),
 			},
 			"url": {
@@ -66,83 +65,69 @@ func resourceTask() *schema.Resource {
 				ValidateFunc: validation.StringLenBetween(1, 255),
 			},
 			"userpass": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"full_page_download": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_html": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_frames": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_style_sheets": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_scripts": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_images": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_objects": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_applets": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"download_additional": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"ssl_check_certificate_authority": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 			"ssl_check_certificate_cn": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 			"ssl_check_certificate_date": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 			"ssl_check_certificate_revocation": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 			"ssl_check_certificate_usage": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 			"ssl_expiration_reminder_in_days": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  0,
 			},
 			"ssl_client_certificate": {
 				Type:     schema.TypeString,
@@ -246,7 +231,6 @@ func resourceTask() *schema.Resource {
 			"timeout": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      120, // API default is 120 seconds
 				ValidateFunc: validation.IntAtLeast(0),
 			},
 		},
@@ -290,7 +274,7 @@ func resourceTaskCreate(d *schema.ResourceData, meta interface{}) error {
 		PrepareScript:                 d.Get("prepare_script").(string),
 		DNSResolveMode:                d.Get("dns_resolve_mode").(string),
 		DNSserverIP:                   d.Get("dns_server_ip").(string),
-		CustomDNSHosts:                constructCustomDNSHostsString(d.Get("custom_dns_hosts").([]interface{})),
+		CustomDNSHosts:                flattenCustomDnsHostsToString(d.Get("custom_dns_hosts").([]interface{})),
 		TaskTypeID:                    d.Get("task_type_id").(int),
 		Timeout:                       d.Get("timeout").(int),
 	}
@@ -298,9 +282,7 @@ func resourceTaskCreate(d *schema.ResourceData, meta interface{}) error {
 
 	// HACK: Dotcom-Monitor states timeout is in seconds, but it is actually stored in milliseconds
 	//  We store it in seconds in state, so here we convert state data into milliseconds
-	if task.Timeout != 0 {
-		task.Timeout = task.Timeout * 1000
-	}
+	task.Timeout = task.Timeout * 1000
 
 	// create the task
 	err := api.CreateTask(task)
@@ -327,14 +309,8 @@ func resourceTaskRead(d *schema.ResourceData, meta interface{}) error {
 	// Pull task ID from state
 	taskID, _ := strconv.Atoi(d.Id())
 
-	// Check if task exists before trying to read it
-	if !doesTaskExist(taskID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Task does not exist, removing ID %v from state", taskID)
-		d.SetId("")
-		return nil
-	}
-
 	task := &client.Task{}
+	task.ID = taskID
 
 	api := meta.(*client.APIClient)
 	err := api.GetTask(task)
@@ -347,27 +323,69 @@ func resourceTaskRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[Dotcom-Monitor] Failed to get task: %s", err)
 	}
 
+	// Check if task exists before trying to read it
+	if !(task.ID > 0) {
+		log.Printf("[Dotcom-Monitor] [WARNING] Task does not exist, removing ID %v from state", task.ID)
+		d.SetId("")
+		return nil
+	}
+
 	// HACK: Dotcom-Monitor states timeout is in seconds, but it is actually stored in milliseconds
 	//  We store it in seconds in state, so here we convert API data back to seconds
 	if task.Timeout != 0 {
 		task.Timeout = task.Timeout / 1000
 	}
 
+	d.Set("request_type", task.RequestType)
+	d.Set("url", task.URL)
+	d.Set("name", task.Name)
+	d.Set("device_id", task.DeviceID)
+	d.Set("keyword1", task.Keyword1)
+	d.Set("keyword2", task.Keyword2)
+	d.Set("keyword3", task.Keyword3)
+	d.Set("username", task.UserName)
+	d.Set("userpass", task.UserPass)
+	d.Set("full_page_download", task.FullPageDownload)
+	d.Set("download_html", task.DownloadHTML)
+	d.Set("download_frames", task.DownloadFrames)
+	d.Set("download_style_sheets", task.DownloadStyleSheets)
+	d.Set("download_scripts", task.DownloadScripts)
+	d.Set("download_images", task.DownloadImages)
+	d.Set("download_objects", task.DownloadObjects)
+	d.Set("download_applets", task.DownloadApplets)
+	d.Set("download_additional", task.DownloadAdditional)
+	d.Set("ssl_check_certificate_authority", task.SSLCheckCertificateAuthority)
+	d.Set("ssl_check_certificate_cn", task.SSLCheckCertificateCN)
+	d.Set("ssl_check_certificate_date", task.SSLCheckCertificateDate)
+	d.Set("ssl_check_certificate_revocation", task.SSLCheckCertificateRevocation)
+	d.Set("ssl_check_certificate_usage", task.SSLCheckCertificateUsage)
+	d.Set("ssl_expiration_reminder_in_days", task.SSLExpirationReminderInDays)
+	d.Set("ssl_client_certificate", task.SSLClientCertificate)
+	if task.GetParams != nil {
+		d.Set("get_params", task.GetParams)
+	}
+	if task.PostParams != nil {
+		d.Set("post_params", task.PostParams)
+	}
+	if task.HeaderParams != nil {
+		d.Set("post_params", task.HeaderParams)
+	}
+	d.Set("prepare_script", task.PrepareScript)
+	d.Set("dns_resolve_mode", task.DNSResolveMode)
+	d.Set("dns_server_ip", task.DNSserverIP)
+	d.Set("custom_dns_hosts", task.CustomDNSHosts) // not really sure why this works, but it does
+	d.Set("task_type_id", task.TaskTypeID)
+	d.Set("timeout", task.Timeout)
+
 	return nil
 }
 
 func resourceTaskUpdate(d *schema.ResourceData, meta interface{}) error {
 	mutex.Lock()
+	d.Partial(true)
 
 	// Pull task ID from state
 	taskID, _ := strconv.Atoi(d.Id())
-
-	// Check if task exists before trying to update it
-	if !doesTaskExist(taskID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Task does not exist, removing ID %v from state", taskID)
-		d.SetId("")
-		return nil
-	}
 
 	task := &client.Task{
 		ID:                            taskID,
@@ -402,7 +420,7 @@ func resourceTaskUpdate(d *schema.ResourceData, meta interface{}) error {
 		PrepareScript:                 d.Get("prepare_script").(string),
 		DNSResolveMode:                d.Get("dns_resolve_mode").(string),
 		DNSserverIP:                   d.Get("dns_server_ip").(string),
-		CustomDNSHosts:                constructCustomDNSHostsString(d.Get("custom_dns_hosts").([]interface{})),
+		CustomDNSHosts:                flattenCustomDnsHostsToString(d.Get("custom_dns_hosts").([]interface{})),
 		TaskTypeID:                    d.Get("task_type_id").(int),
 		Timeout:                       d.Get("timeout").(int),
 	}
@@ -425,6 +443,7 @@ func resourceTaskUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[Dotcom-Monitor] Task ID: %v successfully updated", fmt.Sprint(task.ID))
 
 	mutex.Unlock()
+	d.Partial(false)
 	return resourceTaskRead(d, meta)
 }
 
@@ -434,13 +453,6 @@ func resourceTaskDelete(d *schema.ResourceData, meta interface{}) error {
 
 	// Pull task ID from state
 	taskID, _ := strconv.Atoi(d.Id())
-
-	// Check if task exists before trying to remove it
-	if !doesTaskExist(taskID, meta) {
-		log.Printf("[Dotcom-Monitor] [WARNING] Task does not exist, removing ID %v from state", taskID)
-		d.SetId("")
-		return nil
-	}
 
 	task := &client.Task{
 		ID: taskID,
@@ -453,40 +465,7 @@ func resourceTaskDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[Dotcom-Monitor] Failed to delete task: %s", err)
 	}
 
+	d.SetId("")
+
 	return nil
-}
-
-// doesTaskExist ... determintes if a task with the given taskID exists
-func doesTaskExist(taskID int, meta interface{}) bool {
-	log.Printf("[Dotcom-Monitor] [DEBUG] Checking if task exists with ID: %v", taskID)
-	task := &client.Task{
-		ID: taskID,
-	}
-
-	// Since an empty HTTP response is a valid 200 from the API, we will determine if
-	//  the task exists by comparing the hash of the struct before and after the HTTP call.
-	//  If the has does not change, it means nothing else was added, therefore it does not exist.
-	//  If the hash changes, the API found the task and added the rest of the fields.
-	h := sha256.New()
-	t := fmt.Sprintf("%v", task)
-	sum := h.Sum([]byte(t))
-	log.Printf("[Dotcom-Monitor] [DEBUG] Hash before: %x", sum)
-
-	// Try to get task from API
-	api := meta.(*client.APIClient)
-	err := api.GetTask(task)
-
-	t2 := fmt.Sprintf("%v", task)
-	sum2 := h.Sum([]byte(t2))
-	log.Printf("[Dotcom-Monitor] [DEBUG] Hash after: %x", sum2)
-
-	// Compare the hashes, and if there was an error from the API we will assume the task exists
-	//  to be safe that we do not improperly remove an existing task from state
-	if bytes.Equal(sum, sum2) && err == nil {
-		log.Println("[Dotcom-Monitor] [DEBUG] No new fields added to the task, therefore the task did not exist")
-		return false
-	}
-
-	// If we get here, we can assume the task does exist
-	return true
 }

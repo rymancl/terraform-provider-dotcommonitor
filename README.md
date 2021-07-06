@@ -2,7 +2,7 @@
 
 This is a Terraform provider for [Dotcom-Monitor](https://www.dotcom-monitor.com). You can read about their API [here](https://wiki.dotcom-monitor.com/knowledge-base/getting-started-with-the-api/).
 
-Latest documentation can be found here: https://registry.terraform.io/providers/rymancl/dotcommonitor/latest/docs
+Latest documentation can be found on the [Terraform Registry](https://registry.terraform.io/providers/rymancl/dotcommonitor/latest/docs).
 
 ### Requirements
 * [Terraform](https://www.terraform.io/downloads.html) >=0.13
