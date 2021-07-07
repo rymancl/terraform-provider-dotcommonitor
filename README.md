@@ -1,7 +1,7 @@
 # Terraform provider for Dotcom-Monitor
 
 ![Status: Tech Preview](https://img.shields.io/badge/status-experimental-yellow) 
-[![Releases](https://img.shields.io/github/v/release/rymancl/terraform-provider-dotcommonitor.svg)](https://github.com/rymancl/terraform-provider-dotcommonitor/releases)
+[![Releases](https://img.shields.io/github/v/release/rymancl/terraform-provider-dotcommonitor.svg)](https://github.com/rymancl/terraform-provider-dotcommonitor/releases) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 The Terraform provider for [Dotcom-Monitor](https://www.dotcom-monitor.com) makes it easy to ensure performance, functionality, and uptime of websites, web applications, servers, and APIs. Using this provider allows you to follow a "monitoring-as-code" observability approach.
 
