@@ -19,4 +19,4 @@ Please review the [contribution guide](_about/CONTRIBUTING.md) to begin.
 
 ## Requirements
 * [Terraform](https://www.terraform.io/downloads.html) >=0.13
-* [Go](https://golang.org/doc/install) >=1.15 (to build the provider plugin)
+* [Go](https://golang.org/doc/install) >=1.16 (to build the provider plugin)

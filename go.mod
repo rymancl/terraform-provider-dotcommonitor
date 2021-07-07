@@ -1,6 +1,6 @@
 module github.com/rymancl/terraform-provider-dotcommonitor
 
-go 1.15
+go 1.16
 
 require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
