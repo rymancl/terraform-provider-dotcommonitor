@@ -1,0 +1,17 @@
+branches:
+  - main
+
+plugins:
+  - path: "@semantic-release/commit-analyzer"
+    preset: conventionalcommits
+    releaseRules:
+    - type: docs
+      release: patch
+    - type: refactor
+      release: patch
+  - path: "@semantic-release/release-notes-generator"
+    preset: conventionalcommits
+  - path: "@semantic-release/changelog"
+  - path: "@semantic-release/git"
+    assets:
+    - CHANGELOG.md
