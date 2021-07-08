@@ -5,6 +5,13 @@
 
 * **ci:** workflow tokens ([1a277a2](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/1a277a2371450527992d092edaef3ac4b4d0bd4f))
 
+### [0.8.6](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.5...v0.8.6) (2021-07-08)
+
+
+### Bug Fixes
+
+* **ci:** workflow tokens ([1a277a2](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/1a277a2371450527992d092edaef3ac4b4d0bd4f))
+
 ### [0.8.5](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.4...v0.8.5) (2021-07-08)
 
 
