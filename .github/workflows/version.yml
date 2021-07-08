@@ -1,4 +1,4 @@
-name: release
+name: version
 on: [workflow_dispatch]
 
 jobs:
