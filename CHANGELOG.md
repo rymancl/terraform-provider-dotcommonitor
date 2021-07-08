@@ -1,3 +1,10 @@
+### [0.8.5](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.4...v0.8.5) (2021-07-08)
+
+
+### Bug Fixes
+
+* **ci:** persisting pat credentials in version workflow ([d85b7ee](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/d85b7ee57b09162c20cf0fefeb5788867733031d))
+
 ### [0.8.4](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.3...v0.8.4) (2021-07-08)
 
 
