@@ -1,3 +1,10 @@
+### [0.8.4](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.3...v0.8.4) (2021-07-08)
+
+
+### Bug Fixes
+
+* **ci:** adding branch filter to release workflow ([917e080](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/917e0809fc17683ef8baab836bfd2d8bf446faad))
+
 ### [0.8.3](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.2...v0.8.3) (2021-07-08)
 
 
