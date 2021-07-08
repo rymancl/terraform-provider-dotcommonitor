@@ -1,48 +1,14 @@
 name: release
-on: [workflow_dispatch]
-# on:
-#   push:
-#     tags:
-#       - 'v*'
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  tag:
-    name: tag
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && !github.event.repository.fork }}
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2.3.4
-        with:
-          persist-credentials: false
-
-      - name: install-node
-        uses: actions/setup-node@master
-
-      - name: semantic-release-prerequisites
-        run: |
-          npm install --no-package-lock --no-save \
-            @semantic-release/commit-analyzer \
-            @semantic-release/release-notes-generator \
-            @semantic-release/changelog \
-            @semantic-release/exec \
-            @semantic-release/git \
-            conventional-changelog-conventionalcommits
-
-      # - name: semantic-release-dry-run
-      #   run: npx semantic-release --ci --dry-run
-      #   if: ${{ github.event.repository.fork }}
-
-      - name: semantic-release
-        run: npx semantic-release --ci
-        if: ${{ !github.event.repository.fork }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
-
   goreleaser:
     name: release
-    needs: [tag]
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && !github.event.repository.fork }}
     steps:
       - name: checkout
         uses: actions/checkout@v2.3.4
