@@ -1,3 +1,10 @@
+### [0.8.3](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.2...v0.8.3) (2021-07-08)
+
+
+### Bug Fixes
+
+* **ci:** providing token to checkout ([97df308](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/97df3089b51fbcb2437a1cd0087698080fa603cf))
+
 ### [0.8.2](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.1...v0.8.2) (2021-07-08)
 
 
