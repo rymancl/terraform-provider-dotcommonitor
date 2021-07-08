@@ -1,3 +1,10 @@
+### [0.8.2](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.1...v0.8.2) (2021-07-08)
+
+
+### Bug Fixes
+
+* **ci:** release workflow conditions ([38f7e43](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/38f7e43aa629b8a7cf1912d3e22efffc394e57b0))
+
 ### [0.8.1](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.0...v0.8.1) (2021-07-08)
 
 
