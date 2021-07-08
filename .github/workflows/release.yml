@@ -8,7 +8,7 @@ jobs:
   goreleaser:
     name: release
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && !github.event.repository.fork }}
+    if: ${{ !github.event.repository.fork }}
     steps:
       - name: checkout
         uses: actions/checkout@v2.3.4
