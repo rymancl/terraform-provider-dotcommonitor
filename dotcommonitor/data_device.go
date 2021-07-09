@@ -17,7 +17,6 @@ func dataDevice() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"platform_id": {
 				Type:         schema.TypeInt,
