@@ -1,3 +1,10 @@
+### [0.8.7](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.6...v0.8.7) (2021-07-09)
+
+
+### Bug Fixes
+
+* **ci:** adding manual release fallback ([bfbd1a9](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/bfbd1a9e7bede8f06a7479092b98e72ad4e2dbb7))
+
 ### [0.8.6](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.8.5...v0.8.6) (2021-07-08)
 
 
