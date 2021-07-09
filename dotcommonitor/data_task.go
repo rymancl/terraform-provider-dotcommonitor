@@ -16,7 +16,6 @@ func dataTask() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"device_id": {
 				Type:         schema.TypeInt,
