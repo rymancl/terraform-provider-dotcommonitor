@@ -27,7 +27,7 @@ resource "dotcommonitor_device" "example" {
 * `owner_device_id` - **(Optional, int)** The valid device ID of the device that owns this device.
 * `filter_id` - **(Optional, int)** The valid filter ID to use for the device.
 * `scheduler_id` - **(Optional, int)** The valid scheduler ID to use for the device.
-* `notifications_group` - **(Optional, object)** Configuration block for a notifications group. Can be specified multiple times for each notifications group. Note that groups can only be assigned to a device, you cannot assign a device to a group. Each block supports the fields documented below.
+* `notifications_groups` - **(Optional, set{object})** Configuration block for a notifications group. Can be specified multiple times for each notifications group. Note that groups can only be assigned to a device, you cannot assign a device to a group. Each block supports the fields documented below.
 
 ### locations
 Can be any combination of valid public or private location ID's. This argument can be used in combination with the [locations data source](https://registry.terraform.io/providers/rymancl/dotcommonitor/latest/docs/data-sources/locations) or defined by providing ID's manully.
@@ -71,7 +71,7 @@ Location ID | Location Name
 
 _(last updated: July 2021)_
 
-### notifications_group
+### notifications_groups
 * `id` - **(Required, int)** The ID of the alert group.
 * `time_shift_min` - **(Optional, int)** The escalation time for the alert, in minutes. Can be one of 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180.
 
@@ -84,5 +84,5 @@ In addition to all arguments above, the following attributes are exported:
 `dotcommonitor_device` can be imported using the ID of the device, e.g.
 
 ```
-$ terraform import dotcommonitor_device.example device12345
+$ terraform import dotcommonitor_device.example 12345
 ```

@@ -77,8 +77,8 @@ func resourceDevice() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.IntAtLeast(0),
 			},
-			"notifications_group": {
-				Type:     schema.TypeList,
+			"notifications_groups": {
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -105,7 +105,7 @@ func resourceDeviceCreate(d *schema.ResourceData, meta interface{}) error {
 	api := meta.(*client.APIClient)
 
 	notifications := &client.DeviceNotificationsBlock{
-		NotificationGroups: constructNotificationsNotificationGroupList(d.Get("notifications_group").([]interface{})),
+		NotificationGroups: constructNotificationsNotificationGroupList(d.Get("notifications_groups").(*schema.Set)),
 	}
 
 	device := &client.Device{
@@ -182,7 +182,7 @@ func resourceDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("scheduler_id", device.SchedulerID)
 
 	if device.Notifications != nil && device.Notifications.NotificationGroups != nil {
-		d.Set("notifications_group", device.Notifications.NotificationGroups)
+		d.Set("notifications_groups", device.Notifications.NotificationGroups)
 	}
 
 	return nil
@@ -196,7 +196,7 @@ func resourceDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 	deviceID, _ := strconv.Atoi(d.Id())
 
 	notifications := &client.DeviceNotificationsBlock{
-		NotificationGroups: constructNotificationsNotificationGroupList(d.Get("notifications_group").([]interface{})),
+		NotificationGroups: constructNotificationsNotificationGroupList(d.Get("notifications_groups").(*schema.Set)),
 	}
 
 	device := &client.Device{
