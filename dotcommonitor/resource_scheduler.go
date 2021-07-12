@@ -3,12 +3,16 @@ package dotcommonitor
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/rymancl/terraform-provider-dotcommonitor/dotcommonitor/client"
 )
+
+const schedulerExcludedTimeIntervalLayout = "2006-01-02T15:04:05Z"
 
 func resourceScheduler() *schema.Resource {
 	return &schema.Resource{
@@ -39,16 +43,23 @@ func resourceScheduler() *schema.Resource {
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"from_minute": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(0, 1439),
+						"from": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "0h0m",
+							ValidateFunc: validation.All(
+								validation.StringMatch(regexp.MustCompile("^([0-9]|[12][0-3])h([0-5]?[0-9])m$"), "must be in the format of [0-23]h[0-59]m"),
+								validateWeeklyIntervalFrom(),
+							),
 						},
-						"to_minute": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							Default:      1440, // end of day
-							ValidateFunc: validation.IntBetween(1, 1440),
+						"to": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "24h0m", // end of day
+							ValidateFunc: validation.All(
+								validation.StringMatch(regexp.MustCompile("^([0-9]|[12][0-4])h([0-5]?[0-9])m$"), "must be in the format of [0-24]h[0-59]m"),
+								validateWeeklyIntervalTo(),
+							),
 						},
 						"enabled": {
 							Type:     schema.TypeBool,
@@ -62,14 +73,15 @@ func resourceScheduler() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"from_unix": {
-							Type:         schema.TypeInt,
+						"from": {
+							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.IntAtLeast(0),
+							ValidateFunc: validateExcludedTimeIntervalTimestamp,
 						},
-						"to_unix": {
-							Type:     schema.TypeInt,
-							Required: true,
+						"to": {
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validateExcludedTimeIntervalTimestamp,
 						},
 					},
 				},
@@ -86,8 +98,8 @@ func resourceSchedulerCreate(d *schema.ResourceData, meta interface{}) error {
 	scheduler := &client.Scheduler{
 		Name:                  d.Get("name").(string),
 		Description:           d.Get("description").(string),
-		WeeklyIntervals:       constructSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").(*schema.Set)),
-		ExcludedTimeIntervals: constructSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").(*schema.Set)),
+		WeeklyIntervals:       expandSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").(*schema.Set)),
+		ExcludedTimeIntervals: expandSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").(*schema.Set)),
 	}
 	log.Printf("[Dotcom-Monitor] Scheduler create configuration: %v", scheduler)
 
@@ -146,10 +158,10 @@ func resourceSchedulerRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", scheduler.Name)
 	d.Set("description", scheduler.Description)
 	if scheduler.WeeklyIntervals != nil {
-		d.Set("weekly_intervals", scheduler.WeeklyIntervals)
+		d.Set("weekly_intervals", flattenSchedulerWeeklyIntervalsList(&scheduler.WeeklyIntervals))
 	}
 	if scheduler.ExcludedTimeIntervals != nil {
-		d.Set("excluded_time_intervals", scheduler.ExcludedTimeIntervals)
+		d.Set("excluded_time_intervals", flattenSchedulerExcludedTimeIntervalsList(&scheduler.ExcludedTimeIntervals))
 	}
 
 	return nil
@@ -166,8 +178,8 @@ func resourceSchedulerUpdate(d *schema.ResourceData, meta interface{}) error {
 		ID:                    schedulerID,
 		Name:                  d.Get("name").(string),
 		Description:           d.Get("description").(string),
-		WeeklyIntervals:       constructSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").(*schema.Set)),
-		ExcludedTimeIntervals: constructSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").(*schema.Set)),
+		WeeklyIntervals:       expandSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").(*schema.Set)),
+		ExcludedTimeIntervals: expandSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").(*schema.Set)),
 	}
 
 	// validate weekly interval days strings
@@ -216,4 +228,103 @@ func resourceSchedulerDelete(d *schema.ResourceData, meta interface{}) error {
 	d.SetId("")
 
 	return nil
+}
+
+//////////////////////////////
+// Scheduler helpers
+//////////////////////////////
+
+// expandSchedulerWeeklyIntervalsList ... constructs a list of dotcommonitor.WeeklyInterval structs based on the set of weekly_intervals in the TF configuration
+func expandSchedulerWeeklyIntervalsList(weeklyIntervals *schema.Set) []client.WeeklyInterval {
+	//log.Printf("[Dotcom-Monitor] Converting weekly_intervals list to dotcommonitor.WeeklyIntervals list")
+
+	wiList := make([]client.WeeklyInterval, len(weeklyIntervals.List()))
+
+	for i, item := range weeklyIntervals.List() {
+		var schemaMap = item.(map[string]interface{})
+
+		wiList[i] = client.WeeklyInterval{
+			Days:       expandStringSet(schemaMap["days"].(*schema.Set)),
+			FromMinute: convertDurationStringToMinutes(schemaMap["from"].(string)),
+			ToMinute:   convertDurationStringToMinutes(schemaMap["to"].(string)),
+			Enabled:    schemaMap["enabled"].(bool),
+		}
+	}
+
+	return wiList
+}
+
+// flattenSchedulerWeeklyIntervalsList ... flattens weekly interval objects to generic interface for state
+func flattenSchedulerWeeklyIntervalsList(weeklyIntervals *[]client.WeeklyInterval) []map[string]interface{} {
+	l := make([]map[string]interface{}, 0)
+
+	for _, item := range *weeklyIntervals {
+		m := make(map[string]interface{})
+		m["days"] = item.Days
+		m["from"] = convertMinutesToDurationString(item.FromMinute)
+		m["to"] = convertMinutesToDurationString(item.ToMinute)
+		m["enabled"] = item.Enabled
+
+		l = append(l, m)
+	}
+
+	return l
+}
+
+// expandSchedulerExcludedTimeIntervalsList ... constructs a list of dotcommonitor.DateTimeInterval structs based on the set of excluded_time_intervals in the TF configuration
+func expandSchedulerExcludedTimeIntervalsList(excludedTimeIntervals *schema.Set) []client.DateTimeInterval {
+	//log.Printf("[Dotcom-Monitor] Converting excluded_time_intervals list to dotcommonitor.DateTimeInterval list")
+
+	etList := make([]client.DateTimeInterval, len(excludedTimeIntervals.List()))
+
+	for i, item := range excludedTimeIntervals.List() {
+		var schemaMap = item.(map[string]interface{})
+
+		etList[i] = client.DateTimeInterval{
+			From: convertExcludedTimeIntervalFormatToUnix(schemaMap["from"].(string)),
+			To:   convertExcludedTimeIntervalFormatToUnix(schemaMap["to"].(string)),
+		}
+	}
+
+	return etList
+}
+
+// flattenSchedulerExcludedTimeIntervalsList ... flattens datetime interval objects to generic interface for state
+func flattenSchedulerExcludedTimeIntervalsList(excludedTimeIntervals *[]client.DateTimeInterval) []map[string]interface{} {
+	l := make([]map[string]interface{}, 0)
+
+	for _, item := range *excludedTimeIntervals {
+		m := make(map[string]interface{})
+		m["from"] = convertUnixToExcludedTimeIntervalFormat(item.From)
+		m["to"] = convertUnixToExcludedTimeIntervalFormat(item.To)
+		l = append(l, m)
+	}
+
+	return l
+}
+
+// convertDurationStringToMinutes ... converts time duration string into minutes
+func convertDurationStringToMinutes(s string) int {
+	d, _ := time.ParseDuration(s)
+	return int(d.Minutes())
+}
+
+// convertMinutesToDurationString ... converts minutes into time duration string
+func convertMinutesToDurationString(i int) string {
+	hours := i / 60
+	mins := i % 60
+	return fmt.Sprintf("%vh%vm", hours, mins)
+}
+
+// convertUnixToExcludedTimeIntervalFormat ... converts Unix epoch time to time format string
+func convertUnixToExcludedTimeIntervalFormat(i int64) string {
+	t := time.Unix(i/1000, 0).UTC() // API time is in milliseconds
+	tf := t.Format(schedulerExcludedTimeIntervalLayout)
+	return tf
+}
+
+// convertExcludedTimeIntervalFormatToUnix ... converts time format string to Unix epoch time
+func convertExcludedTimeIntervalFormatToUnix(s string) int64 {
+	u, _ := time.Parse(schedulerExcludedTimeIntervalLayout, s)
+	return u.Unix() * 1000 // API time is in milliseconds
 }
