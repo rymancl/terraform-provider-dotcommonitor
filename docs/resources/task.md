@@ -40,7 +40,7 @@ resource "dotcommonitor_device" "example" {
 ```
 
 ## Argument Reference
-* `url` - **(Required, string)** The url of the request of the task. Note: if using `get_params`, you may need to [ignore changes](https://www.terraform.io/docs/language/meta-arguments/lifecycle.html#ignore_changes) to this attribute due to the API appending parameters onto the end of the URL.
+* `url` - **(Required, string)** The url of the request of the task. Note: if using `get_params`, the API will append them to the end of the `url`. You may see a plan diff on the first plan after initial creation but this will not cause misconfiguration or drift.
 * `name` - **(Required, string)** The name of the task.
 * `device_id` - **(Required, int)** The valid ID of a device which to add the task to.
 * `request_type` - **(Optional, string)** The type of request of the task. Can be one of "GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH". Defaults to "GET".
@@ -69,13 +69,15 @@ resource "dotcommonitor_device" "example" {
 * `post_params` **(Optional, list{object})** Configuration block for POST request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `get_params`.
 * `headers_params` **(Optional, list{object})** Configuration block for request header parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below.
 * `prepare_script` **(Optional, string)** The script contents to execute.
-* `dns_resolve_mode` **(Optional, string)** The DNS resolve mode of the task. Can be one of "Device Cached", "Non Cached", "TTL Cached", "External DNS Server".
+* `dns_resolve_mode` **(Optional, string)** The DNS resolve mode of the task. Can be one of "Device Cached", "Non Cached", "TTL Cached", "External DNS Server". Defaults to "Device Cached".
 * `dns_server_ip` **(Optional, string)** The IP of a DNS server to use for the task.
 * `custom_dns_hosts` **(Optional, list{object})** Configuration block for a custom DNS host. Can be specified multiple times for each custom DNS host. Each block supports the fields documented below.
 * `task_type_id` **(Optional, int)** The ID of the task type to use for the task. See [ServerView documentation](https://wiki.dotcom-monitor.com/knowledge-base/serverview/) for valid task type ID's. Defaults to 2 (which is, HTTPS).
 * `timeout` **(Optional, int)** The timeout value to use for the task, in seconds.
 
 ### get_params
+Note: the API will append these parameters to the end of the `url`. You may see a plan diff on the first plan after initial creation but this will not cause misconfiguration or drift.
+
 * `name` **(Required, string)** The name of the param.
 * `value` **(Required, string)** The value of the param.
 

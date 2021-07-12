@@ -196,6 +196,7 @@ func resourceTask() *schema.Resource {
 			"dns_resolve_mode": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Default:      "Device Cached",
 				ValidateFunc: validation.StringInSlice([]string{"Device Cached", "Non Cached", "TTL Cached", "External DNS Server"}, true),
 				// External DNS Server requires dns_server_ip
 			},
