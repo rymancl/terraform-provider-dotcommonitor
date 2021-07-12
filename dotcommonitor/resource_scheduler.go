@@ -30,12 +30,12 @@ func resourceScheduler() *schema.Resource {
 				Optional: true,
 			},
 			"weekly_intervals": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"days": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
@@ -58,7 +58,7 @@ func resourceScheduler() *schema.Resource {
 				},
 			},
 			"excluded_time_intervals": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -86,8 +86,8 @@ func resourceSchedulerCreate(d *schema.ResourceData, meta interface{}) error {
 	scheduler := &client.Scheduler{
 		Name:                  d.Get("name").(string),
 		Description:           d.Get("description").(string),
-		WeeklyIntervals:       constructSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").([]interface{})),
-		ExcludedTimeIntervals: constructSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").([]interface{})),
+		WeeklyIntervals:       constructSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").(*schema.Set)),
+		ExcludedTimeIntervals: constructSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").(*schema.Set)),
 	}
 	log.Printf("[Dotcom-Monitor] Scheduler create configuration: %v", scheduler)
 
@@ -166,8 +166,8 @@ func resourceSchedulerUpdate(d *schema.ResourceData, meta interface{}) error {
 		ID:                    schedulerID,
 		Name:                  d.Get("name").(string),
 		Description:           d.Get("description").(string),
-		WeeklyIntervals:       constructSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").([]interface{})),
-		ExcludedTimeIntervals: constructSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").([]interface{})),
+		WeeklyIntervals:       constructSchedulerWeeklyIntervalsList(d.Get("weekly_intervals").(*schema.Set)),
+		ExcludedTimeIntervals: constructSchedulerExcludedTimeIntervalsList(d.Get("excluded_time_intervals").(*schema.Set)),
 	}
 
 	// validate weekly interval days strings

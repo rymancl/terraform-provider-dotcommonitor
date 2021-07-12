@@ -36,16 +36,16 @@ resource "dotcommonitor_device" "example" {
 ## Argument Reference
 * `name` - **(Required, string)** The name of the scheduler.
 * `description` - **(Optional, string)** The description of the scheduler.
-* `weekly_interval` - **(Optional, list{object})** Configuration block for a weekly interval schedule. Can be specified multiple times for each weekly interval. Each block supports the fields documented below.
-* `excluded_time_interval` - **(Optional, list{object})** Configuration block for an excluded time interval schedule. Can be specified multiple times for each excluded time interval. Each block supports the fields documented below.
+* `weekly_intervals` - **(Optional, set{object})** Configuration block for a weekly interval schedule. Can be specified multiple times for each weekly interval. Each block supports the fields documented below.
+* `excluded_time_intervals` - **(Optional, set{object})** Configuration block for an excluded time interval schedule. Can be specified multiple times for each excluded time interval. Each block supports the fields documented below.
 
-### weekly_interval
+### weekly_intervals
 * `days` - **(Required, list{string})** The days the scheduler is active. Can be a list of any of "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa".
 * `from_minute` - **(Optional, int)** The minute of the day when the scheduler becomes active. Can be any int between 0 and 1439. Defaults to 0.
 * `to_minute` - **(Optional, int)** The minute of the day when the scheduler turns inactive. Can be any int between 1 and 1440. Defaults to 1440.
 * `enabled` - **(Optional, bool)** Indicates if the scheduler is enabled.
 
-### excluded_time_interval
+### excluded_time_intervals
 * `from_unix` - **(Required, int)** The starting date/time during which monitoring should be excluded. Per the API, this must be a valid [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).
 * `to_unix` - **(Required, int)** The ending date/time during which monitoring should be excluded. Per the API, this must be a valid [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).
 

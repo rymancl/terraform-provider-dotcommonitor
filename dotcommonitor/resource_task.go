@@ -134,7 +134,7 @@ func resourceTask() *schema.Resource {
 				Optional: true,
 			},
 			"get_params": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -153,7 +153,7 @@ func resourceTask() *schema.Resource {
 				ConflictsWith: []string{"post_params"},
 			},
 			"post_params": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -172,7 +172,7 @@ func resourceTask() *schema.Resource {
 				ConflictsWith: []string{"get_params"},
 			},
 			"header_params": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -269,9 +269,9 @@ func resourceTaskCreate(d *schema.ResourceData, meta interface{}) error {
 		DownloadObjects:               d.Get("download_objects").(bool),
 		DownloadApplets:               d.Get("download_applets").(bool),
 		DownloadAdditional:            d.Get("download_additional").(bool),
-		GetParams:                     expandInterfaceListToTaskParamList(d.Get("get_params").([]interface{})),
-		PostParams:                    expandInterfaceListToTaskParamList(d.Get("post_params").([]interface{})),
-		HeaderParams:                  expandInterfaceListToTaskParamList(d.Get("header_params").([]interface{})),
+		GetParams:                     expandSetToTaskParamList(d.Get("get_params").(*schema.Set)),
+		PostParams:                    expandSetToTaskParamList(d.Get("post_params").(*schema.Set)),
+		HeaderParams:                  expandSetToTaskParamList(d.Get("header_params").(*schema.Set)),
 		PrepareScript:                 d.Get("prepare_script").(string),
 		DNSResolveMode:                d.Get("dns_resolve_mode").(string),
 		DNSserverIP:                   d.Get("dns_server_ip").(string),
@@ -374,7 +374,7 @@ func resourceTaskRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("prepare_script", task.PrepareScript)
 	d.Set("dns_resolve_mode", task.DNSResolveMode)
 	d.Set("dns_server_ip", task.DNSserverIP)
-	d.Set("custom_dns_hosts", task.CustomDNSHosts) // not really sure why this works, but it does
+	d.Set("custom_dns_hosts", task.CustomDNSHosts) // not really sure why this works, but it does - changing to TypeSet breaks it
 	d.Set("task_type_id", task.TaskTypeID)
 	d.Set("timeout", task.Timeout)
 
@@ -415,9 +415,9 @@ func resourceTaskUpdate(d *schema.ResourceData, meta interface{}) error {
 		DownloadObjects:               d.Get("download_objects").(bool),
 		DownloadApplets:               d.Get("download_applets").(bool),
 		DownloadAdditional:            d.Get("download_additional").(bool),
-		GetParams:                     expandInterfaceListToTaskParamList(d.Get("get_params").([]interface{})),
-		PostParams:                    expandInterfaceListToTaskParamList(d.Get("post_params").([]interface{})),
-		HeaderParams:                  expandInterfaceListToTaskParamList(d.Get("header_params").([]interface{})),
+		GetParams:                     expandSetToTaskParamList(d.Get("get_params").(*schema.Set)),
+		PostParams:                    expandSetToTaskParamList(d.Get("post_params").(*schema.Set)),
+		HeaderParams:                  expandSetToTaskParamList(d.Get("header_params").(*schema.Set)),
 		PrepareScript:                 d.Get("prepare_script").(string),
 		DNSResolveMode:                d.Get("dns_resolve_mode").(string),
 		DNSserverIP:                   d.Get("dns_server_ip").(string),
