@@ -368,7 +368,7 @@ func resourceTaskRead(d *schema.ResourceData, meta interface{}) error {
 		d.Set("post_params", task.PostParams)
 	}
 	if task.HeaderParams != nil {
-		d.Set("post_params", task.HeaderParams)
+		d.Set("header_params", task.HeaderParams)
 	}
 	d.Set("prepare_script", task.PrepareScript)
 	d.Set("dns_resolve_mode", task.DNSResolveMode)
