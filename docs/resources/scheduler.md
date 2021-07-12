@@ -41,14 +41,13 @@ resource "dotcommonitor_device" "example" {
 
 ### weekly_intervals
 * `days` - **(Required, list{string})** The days the scheduler is active. Can be a list of any of "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa".
-* `from_minute` - **(Optional, int)** The minute of the day when the scheduler becomes active. Can be any int between 0 and 1439. Defaults to 0.
-* `to_minute` - **(Optional, int)** The minute of the day when the scheduler turns inactive. Can be any int between 1 and 1440. Defaults to 1440.
+* `from` - **(Optional, string)** The time of day when the scheduler becomes active. Must be in the format of `##h##m`. The input gets convered to minutes before being passed to the API. Defaults to "0h0m" (start of day).
+* `to` - **(Optional, string)** The time of day when the scheduler turns inactive. Must be in the format of `##h##m`. The input gets convered to minutes before being passed to the API. Defaults to "24h0m" (end of day).
 * `enabled` - **(Optional, bool)** Indicates if the scheduler is enabled.
 
 ### excluded_time_intervals
-* `from_unix` - **(Required, int)** The starting date/time during which monitoring should be excluded. Per the API, this must be a valid [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).
-* `to_unix` - **(Required, int)** The ending date/time during which monitoring should be excluded. Per the API, this must be a valid [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).
-
+* `from` - **(Required, string)** The starting date/time during which monitoring should be excluded. Must be in "YYYY-MM-DDThh:mm:ssZ" format in UTC/GMT only (for example, "2014-06-01T00:00:00Z"). The input gets converted to [Unix epoch](https://en.wikipedia.org/wiki/Unix_time) time before being passed to the API.
+* `to` - **(Required, string)** The ending date/time during which monitoring should be excluded. Must be in "YYYY-MM-DDThh:mm:ssZ" format in UTC/GMT only (for example, "2014-06-01T00:00:00Z"). The input gets converted to [Unix epoch](https://en.wikipedia.org/wiki/Unix_time) time before being passed to the API.
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:

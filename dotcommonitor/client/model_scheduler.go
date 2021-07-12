@@ -20,8 +20,8 @@ type WeeklyInterval struct {
 
 // DateTimeInterval ... struct for non-repeat date time interval
 type DateTimeInterval struct {
-	From int `json:"From,omitempty"` // UNIX time format
-	To   int `json:"To,omitempty"`   // UNIX time format
+	From int64 `json:"From,omitempty"` // UNIX time format
+	To   int64 `json:"To,omitempty"`   // UNIX time format
 }
 
 // AssignedTo ... struct for non-repeat date time interval
