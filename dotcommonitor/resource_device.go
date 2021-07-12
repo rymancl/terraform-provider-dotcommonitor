@@ -25,6 +25,11 @@ func resourceDevice() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.StringLenBetween(1, 255),
 			},
+			"locations": {
+				Type:     schema.TypeSet,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
 			"platform_id": {
 				Type:         schema.TypeInt,
 				Optional:     true,
@@ -36,11 +41,6 @@ func resourceDevice() *schema.Resource {
 				Optional:     true,
 				Default:      300,
 				ValidateFunc: validation.IntInSlice([]int{60, 180, 300, 600, 900, 1800, 2700, 3600, 7200, 10800}), // in seconds
-			},
-			"locations": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 			"avoid_simultaneous_checks": {
 				Type:     schema.TypeBool,
@@ -112,7 +112,7 @@ func resourceDeviceCreate(d *schema.ResourceData, meta interface{}) error {
 		Name:                    d.Get("name").(string),
 		PlatformID:              d.Get("platform_id").(int),
 		Frequency:               d.Get("frequency").(int),
-		Locations:               convertInterfaceListToIntList(d.Get("locations").([]interface{})),
+		Locations:               expandIntSet(d.Get("locations").(*schema.Set)),
 		AvoidSimultaneousChecks: d.Get("avoid_simultaneous_checks").(bool),
 		AlertSilenceMin:         d.Get("alert_silence_min").(int),
 		FalsePositiveCheck:      d.Get("false_positive_check").(bool),
@@ -204,7 +204,7 @@ func resourceDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 		Name:                    d.Get("name").(string),
 		PlatformID:              d.Get("platform_id").(int),
 		Frequency:               d.Get("frequency").(int),
-		Locations:               convertInterfaceListToIntList(d.Get("locations").([]interface{})),
+		Locations:               expandIntSet(d.Get("locations").(*schema.Set)),
 		AvoidSimultaneousChecks: d.Get("avoid_simultaneous_checks").(bool),
 		AlertSilenceMin:         d.Get("alert_silence_min").(int),
 		FalsePositiveCheck:      d.Get("false_positive_check").(bool),
