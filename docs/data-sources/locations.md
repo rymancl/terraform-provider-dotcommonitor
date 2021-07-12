@@ -55,8 +55,8 @@ resource "dotcommonitor_device" "monitor_private" {
 * `all_locations` - **(Optional, bool)** Select all locations on the account, public and private. Must provide exactly one of `all_locations`, `all_public_locations`, `all_private_locations`, `ids`, `names`.
 * `all_public_locations` - **(Optional, bool)** Select all public locations. Must provide exactly one of `all_locations`, `all_public_locations`, `all_private_locations`, `ids`, `names`.
 * `all_private_locations` - **(Optional, bool)** Select all private agent locations. Must provide exactly one of `all_locations`, `all_public_locations`, `all_private_locations`, `ids`, `names`.
-* `ids` - **(Optional, list{int})** List of location ID's to select. Must provide exactly one of `all_locations`, `all_public_locations`, `all_private_locations`, `ids`, `names`.
-* `names` - **(Optional, list{string})** List of location names to select. Must provide exactly one of `all_locations`, `all_public_locations`, `all_private_locations`, `ids`, `names`.
+* `ids` - **(Optional, set{int})** List of location ID's to select. Must provide exactly one of `all_locations`, `all_public_locations`, `all_private_locations`, `ids`, `names`.
+* `names` - **(Optional, set{string})** List of location names to select. Must provide exactly one of `all_locations`, `all_public_locations`, `all_private_locations`, `ids`, `names`.
 * `platform_id` - **(Optional, int)** The ID of the platform. Locations are only supported in ServerView (1) and UserView, but since the API does not support UserView, only 1 is valid here.
 * `include_unavailable` - **(Optional, bool)** Indicates whether or not to include locations not marked "Avilable" from the API. Defaults to `false`.
 * `include_restrictive` - **(Optional, bool)** Indicates whether or not to include locations the provider restrictive by country-wide firewalls, government regulations, restrictions, etc. Defaults to `true`. Defined below.

@@ -65,9 +65,9 @@ resource "dotcommonitor_device" "example" {
 * `ssl_check_certificate_usage` - **(Optional, bool)** Indicates if the task should check the SSL certificate usage.
 * `ssl_expiration_reminder_in_days` - **(Optional, int)** Sends an expiration alert X number of days prior to certificate expiration. Defaults to 0, meaning no expiration alert.
 * `ssl_client_certificate` - **(Optional, string)** The name of the client certificate needed to access the site.
-* `get_params` **(Optional, list{object})** Configuration block for GET request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `post_params`.
-* `post_params` **(Optional, list{object})** Configuration block for POST request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `get_params`.
-* `headers_params` **(Optional, list{object})** Configuration block for request header parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below.
+* `get_params` **(Optional, set{object})** Configuration block for GET request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `post_params`.
+* `post_params` **(Optional, set{object})** Configuration block for POST request parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below. Conflicts with `get_params`.
+* `headers_params` **(Optional, set{object})** Configuration block for request header parameter. Can be specified multiple times for each parameter. Each block supports the fields documented below.
 * `prepare_script` **(Optional, string)** The script contents to execute.
 * `dns_resolve_mode` **(Optional, string)** The DNS resolve mode of the task. Can be one of "Device Cached", "Non Cached", "TTL Cached", "External DNS Server". Defaults to "Device Cached".
 * `dns_server_ip` **(Optional, string)** The IP of a DNS server to use for the task.
@@ -103,5 +103,5 @@ In addition to all arguments above, the following attributes are exported:
 `dotcommonitor_task` can be imported using the ID of the task, e.g.
 
 ```
-$ terraform import dotcommonitor_task.example task12345
+$ terraform import dotcommonitor_task.example 12345
 ```

@@ -57,6 +57,11 @@ func expandIntSet(set *schema.Set) []int {
 	return convertInterfaceListToIntList(set.List())
 }
 
+// expandStringSet ... type asserting a set to a list of string
+func expandStringSet(set *schema.Set) []string {
+	return convertInterfaceListToStringList(set.List())
+}
+
 // intInList .. checks if the int is in the list of ints
 func intInList(intList []int, num int) bool {
 	sort.Ints(intList)
@@ -77,17 +82,17 @@ func stringInList(stringList []string, s string) bool {
 // Task helpers
 //////////////////////////////
 
-// expandInterfaceListToTaskParamList ... type asserting a list of interfaces to a list of TaskParam
-func expandInterfaceListToTaskParamList(schemaInterfaceList []interface{}) []client.TaskParam {
-	taskParamList := make([]client.TaskParam, len(schemaInterfaceList))
+// expandSetToTaskParamList ... type asserting a set to a list of TaskParam
+func expandSetToTaskParamList(sets *schema.Set) []client.TaskParam {
+	taskParamList := make([]client.TaskParam, len(sets.List()))
 
-	for i, item := range schemaInterfaceList {
+	for i, item := range sets.List() {
 		var schemaMap = item.(map[string]interface{})
 		taskParamList[i] = client.TaskParam{
 			Name:  schemaMap["name"].(string),
 			Value: schemaMap["value"].(string),
 		}
-		//log.Printf("[Dotcom-Monitor] [expandInterfaceListToTaskParamList] Added TaskParam to list - Name: %v  Value: %v", taskParamList[i].Name, taskParamList[i].Value)
+		//log.Printf("[Dotcom-Monitor] [expandSetToTaskParamList] Added TaskParam to list - Name: %v  Value: %v", taskParamList[i].Name, taskParamList[i].Value)
 	}
 	return taskParamList
 }
@@ -118,13 +123,13 @@ func flattenCustomDnsHostsToString(hosts []interface{}) string {
 // Device helpers
 //////////////////////////////
 
-// constructNotificationsNotificationGroupList ... constructs a list of dotcommonitor.NotificationsNotificationGroups structs based on the list of notifications_group in the TF configuration
-func constructNotificationsNotificationGroupList(notificationGroups []interface{}) []client.NotificationsNotificationGroups {
+// constructNotificationsNotificationGroupList ... constructs a list of dotcommonitor.NotificationsNotificationGroups structs based on the set of notifications_group in the TF configuration
+func constructNotificationsNotificationGroupList(notificationGroups *schema.Set) []client.NotificationsNotificationGroups {
 	//log.Printf("[Dotcom-Monitor] Converting notifications_group list to dotcommonitor.NotificationsNotificationGroups list")
 
-	nnGroupList := make([]client.NotificationsNotificationGroups, len(notificationGroups))
+	nnGroupList := make([]client.NotificationsNotificationGroups, len(notificationGroups.List()))
 
-	for i, item := range notificationGroups {
+	for i, item := range notificationGroups.List() {
 		var schemaMap = item.(map[string]interface{})
 
 		nnGroupList[i] = client.NotificationsNotificationGroups{
@@ -232,17 +237,17 @@ func removeRestrictiveLocations(locations []client.Location) []client.Location {
 // Scheduler helpers
 //////////////////////////////
 
-// constructSchedulerWeeklyIntervalsList ... constructs a list of dotcommonitor.WeeklyInterval structs based on the list of weekly_intervals in the TF configuration
-func constructSchedulerWeeklyIntervalsList(weeklyIntervals []interface{}) []client.WeeklyInterval {
+// constructSchedulerWeeklyIntervalsList ... constructs a list of dotcommonitor.WeeklyInterval structs based on the set of weekly_intervals in the TF configuration
+func constructSchedulerWeeklyIntervalsList(weeklyIntervals *schema.Set) []client.WeeklyInterval {
 	//log.Printf("[Dotcom-Monitor] Converting weekly_intervals list to dotcommonitor.WeeklyIntervals list")
 
-	wiList := make([]client.WeeklyInterval, len(weeklyIntervals))
+	wiList := make([]client.WeeklyInterval, len(weeklyIntervals.List()))
 
-	for i, item := range weeklyIntervals {
+	for i, item := range weeklyIntervals.List() {
 		var schemaMap = item.(map[string]interface{})
 
 		wiList[i] = client.WeeklyInterval{
-			Days:       convertInterfaceListToStringList(schemaMap["days"].([]interface{})),
+			Days:       expandStringSet(schemaMap["days"].(*schema.Set)),
 			FromMinute: schemaMap["from_minute"].(int),
 			ToMinute:   schemaMap["to_minute"].(int),
 			Enabled:    schemaMap["enabled"].(bool),
@@ -252,13 +257,13 @@ func constructSchedulerWeeklyIntervalsList(weeklyIntervals []interface{}) []clie
 	return wiList
 }
 
-// constructSchedulerExcludedTimeIntervalsList ... constructs a list of dotcommonitor.DateTimeInterval structs based on the list of excluded_time_intervals in the TF configuration
-func constructSchedulerExcludedTimeIntervalsList(excludedTimeIntervals []interface{}) []client.DateTimeInterval {
+// constructSchedulerExcludedTimeIntervalsList ... constructs a list of dotcommonitor.DateTimeInterval structs based on the set of excluded_time_intervals in the TF configuration
+func constructSchedulerExcludedTimeIntervalsList(excludedTimeIntervals *schema.Set) []client.DateTimeInterval {
 	//log.Printf("[Dotcom-Monitor] Converting excluded_time_intervals list to dotcommonitor.DateTimeInterval list")
 
-	etList := make([]client.DateTimeInterval, len(excludedTimeIntervals))
+	etList := make([]client.DateTimeInterval, len(excludedTimeIntervals.List()))
 
-	for i, item := range excludedTimeIntervals {
+	for i, item := range excludedTimeIntervals.List() {
 		var schemaMap = item.(map[string]interface{})
 
 		etList[i] = client.DateTimeInterval{

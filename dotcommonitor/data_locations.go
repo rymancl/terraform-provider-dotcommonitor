@@ -31,13 +31,13 @@ func dataLocations() *schema.Resource {
 				ExactlyOneOf: []string{"all_locations", "all_public_locations", "all_private_locations", "ids", "names"},
 			},
 			"ids": {
-				Type:         schema.TypeList,
+				Type:         schema.TypeSet,
 				Optional:     true,
 				Elem: 		  &schema.Schema{Type: schema.TypeInt},
 				ExactlyOneOf: []string{"all_locations", "all_public_locations", "all_private_locations", "ids", "names"},
 			},
 			"names": {
-				Type:         schema.TypeList,
+				Type:         schema.TypeSet,
 				Optional:     true,
 				Elem: 		  &schema.Schema{Type: schema.TypeString},
 				ExactlyOneOf: []string{"all_locations", "all_public_locations", "all_private_locations", "ids", "names"},
@@ -72,8 +72,8 @@ func dataLocationsRead(d *schema.ResourceData, meta interface{}) error {
 	all := d.Get("all_locations").(bool)
 	allPublic := d.Get("all_public_locations").(bool)
 	allPrivate := d.Get("all_private_locations").(bool)
-	ids := convertInterfaceListToIntList(d.Get("ids").([]interface{}))
-	names := convertInterfaceListToStringList(d.Get("names").([]interface{}))
+	ids := expandIntSet(d.Get("ids").(*schema.Set))
+	names := expandStringSet(d.Get("names").(*schema.Set))
 	platformID := d.Get("platform_id").(int)
 	includeUnavailable := d.Get("include_unavailable").(bool)
 	includeRestrictive := d.Get("include_restrictive").(bool)
