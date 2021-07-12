@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/rymancl/terraform-provider-dotcommonitor/dotcommonitor/client"
 )
 
@@ -49,6 +50,11 @@ func convertInterfaceListToStringList(interfaceList []interface{}) []string {
 	}
 
 	return stringList
+}
+
+// expandIntSet ... type asserting a set to a list of int
+func expandIntSet(set *schema.Set) []int {
+	return convertInterfaceListToIntList(set.List())
 }
 
 // intInList .. checks if the int is in the list of ints
