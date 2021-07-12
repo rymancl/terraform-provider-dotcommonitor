@@ -16,9 +16,9 @@ resource "dotcommonitor_device" "example" {
 
 ## Argument Reference
 * `name` - **(Required, string)** The name of the device.
+* `locations` - **(Required, set{int})** The list of location ID's for monitoring agents. Defined below.
 * `platform_id` - **(Optional, int)**  The ID of the platform of the device. See [Monitoring Platforms](https://wiki.dotcom-monitor.com/knowledge-base-category/monitoring-platforms/) for more info. Note that [UserView is not supported](https://wiki.dotcom-monitor.com/knowledge-base/get-device-list-by-platform/) by API v.1. Can be one of 1 (ServerView), 3 (MetricsView), 7 (BrowserView). Defaults to 1.
 * `frequency` - **(Optional, int)** The frequency that that the device checks at, in seconds. Can be one of 60, 180, 300, 600, 900, 1800, 2700, 3600, 7200, 10800. Defaults to 300.
-* `locations` - **(Optional, list{int})** The list of location ID's for monitoring agents. Defined below. Note that if you do not provide this argument upon creation, the API will assign all locations and drift will be detected on subsequent plans.
 * `avoid_simultaneous_checks` - **(Optional, bool)** Indicates if the device should avoid simultaneous checks.
 * `alert_silence_min` - **(Optional, int)** The length of time alerts should be silenced, in minutes.
 * `false_positive_check` - **(Optional, bool)** Indicates if the device should check for false positives (brief hiccup / network glitch). Dotcom-Monitor recommends having this enabled.
