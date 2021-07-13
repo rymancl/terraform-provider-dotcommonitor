@@ -51,14 +51,20 @@ func resourceGroup() *schema.Resource {
 							ValidateFunc: validation.StringLenBetween(1, 255),
 						},
 						"number": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: groupAddressNumberIsValid(),
+							Type:     schema.TypeString,
+							Optional: true,
+							ValidateFunc: validation.All(
+								validation.StringLenBetween(1, 16),
+								validateGroupAddressNumber(),
+							),
 						},
 						"code": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: groupAddressCodeIsValid(),
+							Type:     schema.TypeString,
+							Optional: true,
+							ValidateFunc: validation.All(
+								validation.StringLenBetween(3, 3),
+								validateGroupAddressCode(),
+							),
 						},
 						"message": {
 							Type:         schema.TypeString,
