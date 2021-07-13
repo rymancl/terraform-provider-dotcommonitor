@@ -29,6 +29,9 @@ jobs:
       #   run: npx semantic-release --ci --dry-run
       #   if: ${{ github.event.repository.fork }}
 
+      - name: semantic-release-dry-run
+        run: npx semantic-release --ci --dry-run
+      
       - name: semantic-release
         run: npx semantic-release --ci
         env:
