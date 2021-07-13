@@ -1,6 +1,6 @@
 name: release
 on:
-  push:
+  create:
     tags:
       - 'v*'
   workflow_dispatch:
