@@ -82,7 +82,7 @@ func resourceGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 	api := meta.(*client.APIClient)
 
-	addresses := constructGroupAddresses(d.Get("addresses").([]interface{}))
+	addresses := expandGroupAddresses(d.Get("addresses").([]interface{}))
 
 	group := &client.Group{
 		Name:        d.Get("name").(string),
@@ -151,7 +151,7 @@ func resourceGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	// Pull group ID from state
 	groupID, _ := strconv.Atoi(d.Id())
 
-	addresses := constructGroupAddresses(d.Get("addresses").([]interface{}))
+	addresses := expandGroupAddresses(d.Get("addresses").([]interface{}))
 
 	group := &client.Group{
 		ID:          groupID,
@@ -198,4 +198,43 @@ func resourceGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	d.SetId("")
 
 	return nil
+}
+
+//////////////////////////////
+// Group helpers
+//////////////////////////////
+
+// expandGroupAddresses .. constructs a list of client.Addresses structs based on the addresses schema in the TF configuration
+func expandGroupAddresses(schemaAddresses []interface{}) []client.Addresses {
+	addressList := make([]client.Addresses, len(schemaAddresses))
+
+	for i, item := range schemaAddresses {
+		var schemaMap = item.(map[string]interface{})
+
+		addressList[i] = client.Addresses{
+			Type:       schemaMap["type"].(string),
+			TemplateID: schemaMap["template_id"].(int),
+		}
+
+		// Populate rest of the struct with the appropriate fields
+		switch addressList[i].Type {
+		case "Email":
+			addressList[i].Address = schemaMap["address"].(string)
+		case "Phone":
+			addressList[i].Number = schemaMap["number"].(string)
+			addressList[i].Code = schemaMap["code"].(string)
+		case "Pager":
+			addressList[i].Number = schemaMap["number"].(string)
+			addressList[i].Code = schemaMap["code"].(string)
+			addressList[i].Message = schemaMap["message"].(string)
+		case "Sms":
+			addressList[i].Number = schemaMap["number"].(string)
+		case "PagerDuty":
+			addressList[i].IntegrationKey = schemaMap["integration_key"].(string)
+		case "Script":
+			addressList[i].Message = schemaMap["message"].(string)
+		}
+	}
+
+	return addressList
 }
