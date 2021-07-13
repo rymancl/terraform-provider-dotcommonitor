@@ -105,7 +105,7 @@ func resourceDeviceCreate(d *schema.ResourceData, meta interface{}) error {
 	api := meta.(*client.APIClient)
 
 	notifications := &client.DeviceNotificationsBlock{
-		NotificationGroups: constructNotificationsNotificationGroupList(d.Get("notifications_groups").(*schema.Set)),
+		NotificationGroups: expandNotificationsNotificationGroupList(d.Get("notifications_groups").(*schema.Set)),
 	}
 
 	device := &client.Device{
@@ -196,7 +196,7 @@ func resourceDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 	deviceID, _ := strconv.Atoi(d.Id())
 
 	notifications := &client.DeviceNotificationsBlock{
-		NotificationGroups: constructNotificationsNotificationGroupList(d.Get("notifications_groups").(*schema.Set)),
+		NotificationGroups: expandNotificationsNotificationGroupList(d.Get("notifications_groups").(*schema.Set)),
 	}
 
 	device := &client.Device{
@@ -254,4 +254,25 @@ func resourceDeviceDelete(d *schema.ResourceData, meta interface{}) error {
 	d.SetId("")
 
 	return nil
+}
+
+//////////////////////////////
+// Device helpers
+//////////////////////////////
+
+// expandNotificationsNotificationGroupList ... constructs a list of dotcommonitor.NotificationsNotificationGroups structs based on the set of notifications_group in the TF configuration
+func expandNotificationsNotificationGroupList(notificationGroups *schema.Set) []client.NotificationsNotificationGroups {
+
+	nnGroupList := make([]client.NotificationsNotificationGroups, len(notificationGroups.List()))
+
+	for i, item := range notificationGroups.List() {
+		var schemaMap = item.(map[string]interface{})
+
+		nnGroupList[i] = client.NotificationsNotificationGroups{
+			ID:           schemaMap["id"].(int),
+			TimeShiftMin: schemaMap["time_shift_min"].(int),
+		}
+	}
+
+	return nnGroupList
 }

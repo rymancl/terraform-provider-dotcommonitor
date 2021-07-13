@@ -1,6 +1,7 @@
 package dotcommonitor
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"strconv"
@@ -275,7 +276,7 @@ func resourceTaskCreate(d *schema.ResourceData, meta interface{}) error {
 		PrepareScript:                 d.Get("prepare_script").(string),
 		DNSResolveMode:                d.Get("dns_resolve_mode").(string),
 		DNSserverIP:                   d.Get("dns_server_ip").(string),
-		CustomDNSHosts:                flattenCustomDnsHostsToString(d.Get("custom_dns_hosts").([]interface{})),
+		CustomDNSHosts:                expandCustomDnsHostsToString(d.Get("custom_dns_hosts").([]interface{})),
 		TaskTypeID:                    d.Get("task_type_id").(int),
 		Timeout:                       d.Get("timeout").(int),
 	}
@@ -421,7 +422,7 @@ func resourceTaskUpdate(d *schema.ResourceData, meta interface{}) error {
 		PrepareScript:                 d.Get("prepare_script").(string),
 		DNSResolveMode:                d.Get("dns_resolve_mode").(string),
 		DNSserverIP:                   d.Get("dns_server_ip").(string),
-		CustomDNSHosts:                flattenCustomDnsHostsToString(d.Get("custom_dns_hosts").([]interface{})),
+		CustomDNSHosts:                expandCustomDnsHostsToString(d.Get("custom_dns_hosts").([]interface{})),
 		TaskTypeID:                    d.Get("task_type_id").(int),
 		Timeout:                       d.Get("timeout").(int),
 	}
@@ -469,4 +470,43 @@ func resourceTaskDelete(d *schema.ResourceData, meta interface{}) error {
 	d.SetId("")
 
 	return nil
+}
+
+//////////////////////////////
+// Task helpers
+//////////////////////////////
+
+// expandSetToTaskParamList ... type asserting a set to a list of TaskParam
+func expandSetToTaskParamList(sets *schema.Set) []client.TaskParam {
+	taskParamList := make([]client.TaskParam, len(sets.List()))
+
+	for i, item := range sets.List() {
+		var schemaMap = item.(map[string]interface{})
+		taskParamList[i] = client.TaskParam{
+			Name:  schemaMap["name"].(string),
+			Value: schemaMap["value"].(string),
+		}
+	}
+	return taskParamList
+}
+
+// expandCustomDnsHostsToString ... returns a string required for the syntax of "CustomDNSHosts"
+//  Syntax:  <host>=<ip>;
+func expandCustomDnsHostsToString(hosts []interface{}) string {
+	buf := bytes.Buffer{}
+
+	for _, item := range hosts {
+		var schemaMap = item.(map[string]interface{})
+		var ip = schemaMap["ip_address"].(string)
+		var host = schemaMap["host"].(string)
+
+		buf.WriteString(host)
+		buf.WriteString("=")
+		buf.WriteString(ip)
+		buf.WriteString(";")
+
+	}
+	resultString := buf.String()
+
+	return resultString
 }
