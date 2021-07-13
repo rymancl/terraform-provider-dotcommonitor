@@ -12,6 +12,9 @@ plugins:
   - path: "@semantic-release/release-notes-generator"
     preset: conventionalcommits
   - path: "@semantic-release/changelog"
+  - path: "@semantic-release/exec"
+    generateNotesCmd: "echo '${nextRelease.notes}' >| RELEASE-NOTES.md"
   - path: "@semantic-release/git"
     assets:
     - CHANGELOG.md
+    - RELEASE-NOTES.md

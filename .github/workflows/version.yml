@@ -31,6 +31,8 @@ jobs:
 
       - name: semantic-release-dry-run
         run: npx semantic-release --ci --dry-run
+        env:
+          GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
       
       - name: semantic-release
         run: npx semantic-release --ci
