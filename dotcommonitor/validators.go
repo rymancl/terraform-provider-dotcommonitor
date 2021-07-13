@@ -12,11 +12,10 @@ import (
 // Group validators
 //////////////////////////////
 
-// groupAddressNumberIsValid ... validates that the given number is:
+// validateGroupAddressNumber ... validates that the given number is:
 //  1) a string type
-//  2) between 1 and 16 characters
-//  3) able to be converted to an integer
-func groupAddressNumberIsValid() schema.SchemaValidateFunc {
+//  2) able to be converted to an integer
+func validateGroupAddressNumber() schema.SchemaValidateFunc {
 	return func(i interface{}, k string) (s []string, es []error) {
 		v, ok := i.(string)
 
@@ -26,25 +25,19 @@ func groupAddressNumberIsValid() schema.SchemaValidateFunc {
 			return
 		}
 
-		// then validate length
-		if len(v) < 1 || len(v) > 16 {
-			es = append(es, fmt.Errorf("%s: invalid number of characters for number - must be between 1 and 16 inclusive", k))
-		}
-
 		// then validate it is a valid number
 		if _, err := strconv.Atoi(v); err != nil {
-			es = append(es, fmt.Errorf("%s: not a valid number", k))
+			es = append(es, fmt.Errorf("%s: \"%v\" is not a valid number", k, v))
 		}
 
 		return
 	}
 }
 
-// groupAddressCodeIsValid ... validates that the given number is:
+// validateGroupAddressCode ... validates that the given number is:
 //  1) a string type
-//  2) exactly 3 characters
-//  3) able to be converted to an integer
-func groupAddressCodeIsValid() schema.SchemaValidateFunc {
+//  2) able to be converted to an integer
+func validateGroupAddressCode() schema.SchemaValidateFunc {
 	return func(i interface{}, k string) (s []string, es []error) {
 		v, ok := i.(string)
 
@@ -54,14 +47,9 @@ func groupAddressCodeIsValid() schema.SchemaValidateFunc {
 			return
 		}
 
-		// then validate length
-		if len(v) != 3 {
-			es = append(es, fmt.Errorf("%s: invalid number of characters for code - must be 3", k))
-		}
-
 		// then validate it is a valid number
 		if _, err := strconv.Atoi(v); err != nil {
-			es = append(es, fmt.Errorf("%s: not a valid code", k))
+			es = append(es, fmt.Errorf("%s: \"%v\" is not a valid code", k, v))
 		}
 
 		return
@@ -99,12 +87,12 @@ func validateWeeklyIntervalFrom() schema.SchemaValidateFunc {
 
 		// then verify input string can be parsed into a Duration
 		if d, err := time.ParseDuration(v); err != nil {
-			es = append(es, fmt.Errorf("unable to parse %v as duration, must be in the format of #h#m", v))
+			es = append(es, fmt.Errorf("%s: unable to parse \"%v\" as duration, must be in the format of #h#m", k, v))
 		} else {
 			// then verify minutes are between 0 & 1439
 			mins := int(d.Minutes())
 			if mins < 0 || mins > 1439 {
-				es = append(es, fmt.Errorf("invalid duration of %v - from time must be between 0 & 1439 minutes", mins))
+				es = append(es, fmt.Errorf("%s: \"%v\", converted to \"%v\" minutes, is invalid - from time must be between 0 & 1439 minutes", k, v, mins))
 			}
 		}
 
@@ -126,12 +114,12 @@ func validateWeeklyIntervalTo() schema.SchemaValidateFunc {
 
 		// then verify input string can be parsed into a Duration
 		if d, err := time.ParseDuration(v); err != nil {
-			es = append(es, fmt.Errorf("unable to parse %v as duration, must be in the format of #h#m", v))
+			es = append(es, fmt.Errorf("%s: unable to parse \"%v\" as duration, must be in the format of #h#m", k, v))
 		} else {
 			// then verify minutes are between 1 & 1440
 			mins := int(d.Minutes())
 			if mins < 0 || mins > 1440 {
-				es = append(es, fmt.Errorf("invalid duration of %v - to time must be between 1 & 1440 minutes", mins))
+				es = append(es, fmt.Errorf("%s: \"%v\", converted to \"%v\" minutes, is invalid - to time must be between 1 & 1440 minutes", k, v, mins))
 			}
 		}
 		return
