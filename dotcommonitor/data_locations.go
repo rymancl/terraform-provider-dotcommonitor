@@ -162,3 +162,50 @@ func populateLocationsAttributes(d *schema.ResourceData, locations []client.Loca
 
 	return nil
 }
+
+
+//////////////////////////////
+// Location helpers
+//////////////////////////////
+
+// locationListContainsLocationID .. checks if provided location ID is valid in the list of locations
+func locationListContainsLocationID(locations []client.Location, id int) bool {
+    for _, item := range locations {
+        if item.ID == id {
+            return true
+        }
+    }
+    return false
+}
+
+// locationListContainsLocationName .. checks if provided location name is valid in the list of locations
+func locationListContainsLocationName(locations []client.Location, name string) bool {
+    for _, item := range locations {
+        if item.Name == name {
+            return true
+        }
+    }
+    return false
+}
+
+// removeRestrictiveLocations .. removes any locations that may be considered restrictive by
+//  country-wide firewalls, government regulations, restrictions, etc.
+//  This list can be updated as appropriate. 
+func removeRestrictiveLocations(locations []client.Location) []client.Location {
+	var restrictiveLocationIds = []int {11, 72, 184, 445, 446, 447, 448}
+	// 11  = Hong Kong
+	// 72  = Shanghai
+	// 184 = Beijing
+	// 445 = Chengdu
+	// 446 = Guangzhou
+	// 447 = Qingdao
+	// 448 = Shenzhen
+
+	var trimmedLocationList []client.Location
+	for _, item := range locations { // iterate selected locations
+		if !intInList(restrictiveLocationIds, item.ID) && !locationListContainsLocationID(trimmedLocationList, item.ID) {
+			trimmedLocationList = append(trimmedLocationList, item)
+		}
+	}
+	return trimmedLocationList
+}
