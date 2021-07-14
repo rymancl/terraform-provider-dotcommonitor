@@ -38,7 +38,7 @@ func resourceGroup() *schema.Resource {
 						"type": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"Email", "Phone", "Sms", "PagerDuty"}, true),
+							ValidateFunc: validation.StringInSlice([]string{"Email", "Phone", "Sms", "PagerDuty", "Slack", "Teams", "AlertOps"}, true),
 						},
 						"template_id": {
 							Type:         schema.TypeInt,
@@ -68,6 +68,16 @@ func resourceGroup() *schema.Resource {
 							),
 						},
 						"integration_key": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(1, 255),
+						},
+						"integration_url": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(1, 255),
+						},
+						"webhook": {
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validation.StringLenBetween(1, 255),
@@ -229,6 +239,12 @@ func expandGroupAddresses(schemaAddresses *schema.Set) []client.Addresses {
 			addressList[i].Number = schemaMap["number"].(string)
 		case "PagerDuty":
 			addressList[i].IntegrationKey = schemaMap["integration_key"].(string)
+		case "AlertOps":
+			addressList[i].IntegrationURL = schemaMap["integration_url"].(string)
+		case "Slack":
+			addressList[i].WebHook = schemaMap["webhook"].(string)
+		case "Teams":
+			addressList[i].WebHook = schemaMap["webhook"].(string)
 			// case "Script":
 			// 	addressList[i].Message = schemaMap["message"].(string)
 		}
