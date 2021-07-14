@@ -1,9 +1,8 @@
-### [0.10.2](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.10.1...v0.10.2) (2021-07-14)
+## [0.11.0](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.10.2...v0.11.0) (2021-07-14)
 
 
-### Bug Fixes
+### Features
 
-* **ci:** only run release on tag ref ([08fefd6](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/08fefd6c46a9de73868b07f785f38301e6dec1aa))
-* **docs:** fixing incorrect resource documentation ([afd2919](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/afd2919381bcae6b3bc2ea5c5fe5cab7d4bf907f))
+* **group:** deprecating pager notifications ([377fda9](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/377fda9018c40e1ef94d14b226ebbe2e7912960b)), closes [#56](https://github.com/rymancl/terraform-provider-dotcommonitor/issues/56)
 
 
