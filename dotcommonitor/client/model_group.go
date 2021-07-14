@@ -17,6 +17,8 @@ type Addresses struct {
 	Number         string `json:"Number,omitempty"`         // for Phone, Sms
 	Code           string `json:"Code,omitempty"`           // for Phone
 	IntegrationKey string `json:"IntegrationKey,omitempty"` // for PagerDuty
+	IntegrationURL string `json:"IntegrationURL,omitempty"` // for AlertOps
+	WebHook        string `json:"WebHook,omitempty"`        // for Slack, Teams
 	// Message        string `json:"Message,omitempty"`        // for Script?
 }
 
