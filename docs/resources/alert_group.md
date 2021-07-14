@@ -36,16 +36,15 @@ resource "dotcommonitor_group" "example" {
 ## Argument Reference
 * `name` - **(Required, string)** The name of the alert group.
 * `scheduler_id` - **(Optional, int)** The valid scheduler ID to use for the group.
-* `addresses` - **(Optional, list{object})** Configuration block for an address. Can be specified multiple times for each address. Each block supports the fields documented below.
+* `addresses` - **(Optional, set{object})** Configuration block for an address. Can be specified multiple times for each address. Each block supports the fields documented below.
 
 ### addresses
-* `type` - **(Required, string)** The type of address. Can be one of "Email", "Phone", "Pager", "Sms", "PagerDuty".
-* `template_id` - **(Optional, int)** The valid ID of the group template.
+* `type` - **(Required, string)** The type of address. Can be one of "Email", "Phone", "Sms", "PagerDuty".
+* `template_id` - **(Optional, int)** The valid ID of the group template. Defaults to 0 (default template).
 * `address` - **(Optional, string)** The address. Valid for "Email" `type` argument.
-* `number` - **(Optional, string)** The number. Valid for "Phone", "Pager" and "Sms" `type` argument.
-* `number` - **(Optional, string)** The number code. Valid for "Phone" and "Pager" `type` argument.
-* `message` - **(Optional, string)** The pager message. Valid for "Pager" `type` argument.
-* `message` - **(Optional, string)** The PagerDuty integration key. Valid for "PagerDuty" `type` argument.
+* `number` - **(Optional, string)** The number. Valid for "Phone", and "Sms" `type` argument.
+* `code` - **(Optional, string)** The number code. Valid for "Phone" and `type` argument.
+* `integration_key` - **(Optional, string)** The PagerDuty integration key. Valid for "PagerDuty" `type` argument.
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:
