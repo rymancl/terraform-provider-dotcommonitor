@@ -1,8 +1,8 @@
-## [0.11.0](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.10.2...v0.11.0) (2021-07-14)
+### [0.11.1](https://github.com/rymancl/terraform-provider-dotcommonitor/compare/v0.11.0...v0.11.1) (2021-07-14)
 
 
-### Features
+### Bug Fixes
 
-* **group:** deprecating pager notifications ([377fda9](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/377fda9018c40e1ef94d14b226ebbe2e7912960b)), closes [#56](https://github.com/rymancl/terraform-provider-dotcommonitor/issues/56)
+* **docs:** scheduler docs formatting ([d8d44be](https://github.com/rymancl/terraform-provider-dotcommonitor/commit/d8d44bea0a0d98ea58d4c69054099a47676f46e9))
 
 
