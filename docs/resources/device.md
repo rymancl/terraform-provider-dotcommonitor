@@ -9,8 +9,7 @@ Represents a Dotcom-Monitor device
 ```hcl
 resource "dotcommonitor_device" "example" {
   name      = "example-device"
-  postpone  = true
-  frequency = 60
+  locations = [2, 3, 4]
 }
 ```
 

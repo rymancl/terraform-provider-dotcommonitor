@@ -10,26 +10,25 @@ Represents a Dotcom-Monitor scheduler
 resource "dotcommonitor_scheduler" "example" {
   name = "example-scheduler"
   weekly_intervals {
-    days        = ["Mo", "Tu"]
-    from_minute = 5
-    to_minute   = 90
-    enabled     = true
+    days    = ["Mo", "Tu"]
+    from    = 1h00m
+    to      = 12h30m
+    enabled = true
   }
   weekly_intervals {
-    days        = ["Th"]
-    from_minute = 30
-    to_minute   = 60
-    enabled     = false
+    days    = ["Th"]
+    enabled = false
   }
   excluded_time_intervals {
-    from_unix = 1358712000000
-    to_unix   = 1358798400000
+    from = "2021-07-10T00:00:00Z"
+    to   = "2021-07-11T24:00:00Z"
   } 
 }
 
 resource "dotcommonitor_device" "example" {
   name         = "example-device"
   scheduler_id = dotcommonitor_scheduler.example.id
+  # other arguments
 }
 ```
 

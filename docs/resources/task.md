@@ -33,9 +33,8 @@ resource "dotcommonitor_task" "example" {
 }
 
 resource "dotcommonitor_device" "example" {
-  name      = "example-device"
-  postpone  = true
-  frequency = 60
+  name = "example-device"
+  # other arguments
 }
 ```
 
