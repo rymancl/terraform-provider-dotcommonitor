@@ -11,8 +11,8 @@ resource "dotcommonitor_scheduler" "example" {
   name = "example-scheduler"
   weekly_intervals {
     days    = ["Mo", "Tu"]
-    from    = 1h00m
-    to      = 12h30m
+    from    = "1h00m"
+    to      = "12h30m"
     enabled = true
   }
   weekly_intervals {
