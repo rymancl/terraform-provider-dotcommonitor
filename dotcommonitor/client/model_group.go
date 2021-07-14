@@ -14,10 +14,10 @@ type Addresses struct {
 	Type           string `json:"Type"`
 	TemplateID     int    `json:"Template_Id,omitempty"`
 	Address        string `json:"Address,omitempty"`        // for Email
-	Number         string `json:"Number,omitempty"`         // for Phone, Pager, Sms
-	Code           string `json:"Code,omitempty"`           // for Phone, Pager
-	Message        string `json:"Message,omitempty"`        // for Pager
+	Number         string `json:"Number,omitempty"`         // for Phone, Sms
+	Code           string `json:"Code,omitempty"`           // for Phone
 	IntegrationKey string `json:"IntegrationKey,omitempty"` // for PagerDuty
+	// Message        string `json:"Message,omitempty"`        // for Script?
 }
 
 // CreateGroupResponseBlock ... struct for create group response
