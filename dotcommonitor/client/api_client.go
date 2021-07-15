@@ -544,3 +544,116 @@ func (c *APIClient) GetSchedulersByName(name string, schedulers *[]Scheduler) er
 
 	return nil
 }
+
+//////////////////////////////
+// Filter functions
+//////////////////////////////
+
+// CreateFilter ... creates a new filter & returns a ref to the filter and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/create-new-filter/
+func (c *APIClient) CreateFilter(filter *Filter) error {
+	apiPath := "filters"
+
+	var resp CreateFilterResponseBlock
+
+	if err := c.Do("PUT", apiPath, filter, &resp); err != nil {
+		return fmt.Errorf("Failed to create filter: %s", err)
+	}
+
+	filter.ID = resp.CreateResponseBlock.Result
+
+	return nil
+}
+
+// GetFilterIds ... gets the list of all filter IDs & returns a ref to the list and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/get-list-of-filters/
+func (c *APIClient) GetFilterIds(filterIDs *[]int) error {
+	apiPath := "filters"
+
+	if err := c.Do("GET", apiPath, nil, &filterIDs); err != nil {
+		return fmt.Errorf("Failed to get all filter IDs: %s", err)
+	}
+
+	return nil
+}
+
+// GetFilter ... gets the filter by filter ID & returns a ref to the filter and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/get-specific-filter-info/
+func (c *APIClient) GetFilter(filter *Filter) error {
+	apiPath := fmt.Sprintf("filter/%s", fmt.Sprint(filter.ID))
+	filter.ID = 0 // reset ID for provider checks
+
+	if err := c.Do("GET", apiPath, nil, &filter); err != nil {
+		return fmt.Errorf("Failed to get filter: %s", err)
+	}
+
+	return nil
+}
+
+// GetFilters ... gets the list of filters & returns a ref to the filters and any error
+func (c *APIClient) GetFilters(filters *[]Filter) error {
+	var allFilterIds []int
+
+	// first, get all filter IDs
+	if filtersErr := c.GetFilterIds(&allFilterIds); filtersErr != nil {
+		return fmt.Errorf("GetFilters failed: %v", filtersErr)
+	}
+
+	for _, item := range allFilterIds {
+		var filter Filter
+		filter.ID = item
+		// then get full filter details for each filter ID
+		if filtersErr := c.GetFilter(&filter); filtersErr != nil {
+			return fmt.Errorf("GetFilters failed: %v", filtersErr)
+		}
+		*filters = append(*filters, filter)
+	}
+
+	return nil
+}
+
+// GetFiltersByName ... gets the list of filters by name & returns a ref to the filters and any error
+func (c *APIClient) GetFiltersByName(name string, filters *[]Filter) error {
+	var allFilters []Filter
+
+	// first, get all filters
+	if filtersErr := c.GetFilters(&allFilters); filtersErr != nil {
+		return fmt.Errorf("GetFiltersByName failed: %v", filtersErr)
+	}
+
+	for _, item := range allFilters {
+		if item.Name == name {
+			*filters = append(*filters, item)
+		}
+	}
+
+	return nil
+}
+
+// UpdateFilter ... updates the filter & returns a ref to the filter and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/edit-filter/
+func (c *APIClient) UpdateFilter(filter *Filter) error {
+	apiPath := fmt.Sprintf("filter/%s", fmt.Sprint(filter.ID))
+
+	var resp UpdateFilterResponseBlock
+
+	if err := c.Do("POST", apiPath, filter, &resp); err != nil {
+		return fmt.Errorf("Failed to update filter: %s", err)
+	}
+
+	return nil
+}
+
+// DeleteFilter ... deletes the filter & returns a ref to the filter and any error
+// https://www.dotcom-monitor.com/wiki/knowledge-base/delete-filter/
+func (c *APIClient) DeleteFilter(filter *Filter) error {
+	apiPath := fmt.Sprintf("filter/%s", fmt.Sprint(filter.ID))
+
+	var resp DeleteFilterResponseBlock
+
+	if err := c.Do("DELETE", apiPath, nil, &resp); err != nil {
+		return fmt.Errorf("Failed to delete filter: %s", err)
+	}
+
+	return nil
+}

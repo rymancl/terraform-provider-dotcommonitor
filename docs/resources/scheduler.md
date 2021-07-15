@@ -54,8 +54,8 @@ In addition to all arguments above, the following attributes are exported:
 * `id` - The ID of the scheduler.
 
 ## Import
-`dotcommonitor_scheduler` can be imported using the ID of the secheduler, e.g.
+`dotcommonitor_scheduler` can be imported using the ID of the scheduler, e.g.
 
 ```
-$ terraform import dotcommonitor_scheduler.example 6789
+$ terraform import dotcommonitor_scheduler.example 12345
 ```
