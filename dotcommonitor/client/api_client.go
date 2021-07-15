@@ -20,6 +20,38 @@ func NewAPIClient() *APIClient {
 }
 
 //////////////////////////////
+// Platform functions
+//////////////////////////////
+
+// GetPlatforms ... gets the list of platforms & returns a ref to the platforms and any error
+func (c *APIClient) GetPlatforms(platforms *[]Platform) error {
+	apiPath := "platforms"
+
+	if err := c.Do("GET", apiPath, nil, &platforms); err != nil {
+		return fmt.Errorf("Failed to get platforms: %s", err)
+	}
+
+	return nil
+}
+
+// IsPlatformAvailable ... checks if the platform ID is available on the account & returns this and any error
+func (c *APIClient) IsPlatformAvailable(platformID int) (bool, error) {
+	var platforms []Platform
+
+	if err := c.GetPlatforms(&platforms); err != nil {
+		return false, fmt.Errorf("IsPlatformAvailable failed: %v", err)
+	}
+
+	for _, item := range platforms {
+		if item.ID == platformID && item.Available {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+//////////////////////////////
 // Task functions
 //////////////////////////////
 
@@ -185,8 +217,15 @@ func (c *APIClient) DeleteDevice(device *Device) error {
 
 // GetDevicesByName ... gets a list of devices on the given platform based on the given name
 func (c *APIClient) GetDevicesByName(platformID int, name string, devices *[]Device) error {
-	deviceIdsAPIPath := fmt.Sprintf("devices/%s", fmt.Sprint(platformID))
+	// ensure platform is enabled
+	available, err := c.IsPlatformAvailable(platformID)
+	if err != nil {
+		return fmt.Errorf("Failed to check platform ID availability: %s", err)
+	} else if !available {
+		return fmt.Errorf("Platform ID %v is not available for this account", platformID)
+	}
 
+	deviceIdsAPIPath := fmt.Sprintf("devices/%s", fmt.Sprint(platformID))
 	var platformDevicesResp []int
 
 	if err := c.Do("GET", deviceIdsAPIPath, nil, &platformDevicesResp); err != nil {
@@ -304,8 +343,15 @@ func (c *APIClient) GetGroupsByName(name string, groups *[]Group) error {
 
 // GetLocations ... gets the list of all locations available in the account by platform ID
 func (c *APIClient) GetLocations(platformID int, includeUnavailable bool, locations *[]Location) error {
-	apiPath := fmt.Sprintf("locations/%s", fmt.Sprint(platformID))
+	// ensure platform is enabled
+	available, err := c.IsPlatformAvailable(platformID)
+	if err != nil {
+		return fmt.Errorf("Failed to check platform ID availability: %s", err)
+	} else if !available {
+		return fmt.Errorf("Platform ID %v is not available for this account", platformID)
+	}
 
+	apiPath := fmt.Sprintf("locations/%s", fmt.Sprint(platformID))
 	var resp []Location
 
 	if err := c.Do("GET", apiPath, nil, &resp); err != nil {
