@@ -16,7 +16,7 @@ resource "dotcommonitor_filter" "example" {
   }
   ignore_errors {
     type  = "http"
-    codes = [301, 302]
+    codes = "300-302;305"
   }
 }
 
@@ -41,7 +41,7 @@ resource "dotcommonitor_device" "example" {
 
 ### ignore_errors
 * `type` - **(Required, string)** The ignored error type. Can be one of "Validation", "Runtime", "CustomScript", "Certificate", "Cryptographic", "Tcp", "Dns", "Udp", "Http", "Ftp", "Sftp", "Smtp", "Pop3", "Imap", "Icmp", "IcmpV6", "DnsBL", "Media", "Sip".
-* `codes` - **(Required, set{int})** The ignored error codes. Must contain at least 1 code. Note: the web console suggests it supports ranges in addition to individual values. According to support (as of July 2021), this isn't actually true: only a list of single values are supported.
+* `codes` - **(Required, string)** The ignored error codes. Support single error codes and ranges of error codes. Code sections must be separated by semi-colons (;) and ranges must be separate by a hyphen (-), for example "300-305;399;402;500-599".
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:

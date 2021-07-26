@@ -145,11 +145,6 @@ func validateExcludedTimeIntervalTimestamp(i interface{}, k string) (ws []string
 //////////////////////////////
 
 // validateIgnoreErrorsCodes ... ensures the ignore errors codes are valid
-/*  NOTE: This was originally written under the assumption that codes could be input as a range or
-		individual values as you can in the console. It turns out the API doesn't actually support
-		what the website "accepts" as valid.
-		Leaving this function here for when Dotcom supports input as expected.
-*/
 func validateIgnoreErrorsCodes(i interface{}, k string) (ws []string, errors []error) {
 	v, ok := i.(string)
 
@@ -159,32 +154,46 @@ func validateIgnoreErrorsCodes(i interface{}, k string) (ws []string, errors []e
 		return
 	}
 
-	split := strings.Split(v, "-")
+	parts := strings.Split(v, IgnoreErrorsCodesSeparator)
 
-	// then validate if input string is a single integer (ex: 400)
-	if len(split) == 1 {
-		if _, err := strconv.Atoi(split[0]); err != nil {
-			errors = append(errors, fmt.Errorf("%s: \"%v\" single code is not a valid number", k, v))
-		}
-	} else if len(split) == 2 {
-		// then validate if input string is a range (ex: 400-499)
-		// ensure each part of the range is a valid integer
-		code1, err1 := strconv.Atoi(split[0])
-		code2, err2 := strconv.Atoi(split[1])
-		if err1 != nil {
-			errors = append(errors, fmt.Errorf("%s: \"%v\" left side of code range is not a valid number", k, v))
-		}
-		if err2 != nil {
-			errors = append(errors, fmt.Errorf("%s: \"%v\" right side of code range is not a valid number", k, v))
-		}
+	for _, item := range parts {
+		var singleErrors []error
+		var rangeErrors []error
 
-		// then validate first part of code range is smaller than the second part
-		if code1 >= code2 {
-			errors = append(errors, fmt.Errorf("%s: \"%v\" left side of code range must be smaller than the right side", k, v))
+		// first see if current item is a single error code
+		if _, errSingle := strconv.Atoi(item); errSingle != nil {
+			// item not a valid single code
+			singleErrors = append(singleErrors, fmt.Errorf("%s: \"%v\" unable to parse input as single error code", k, v))
+
+			// try item as a range
+			r := strings.Split(item, IgnoreErrorsCodesRangeSeparator)
+			if len(r) == 2 {
+				// validate if input string is a range (ex: 400-499)
+				// ensure each part of the range is a valid integer
+				from, errFrom := strconv.Atoi(r[0])
+				to, errTo := strconv.Atoi(r[1])
+				if errFrom != nil {
+					rangeErrors = append(rangeErrors, fmt.Errorf("%s: \"%v\" left side \"%v\" of code range is not a valid number", k, v, from))
+				}
+				if errTo != nil {
+					rangeErrors = append(rangeErrors, fmt.Errorf("%s: \"%v\" right side \"%v\" of code range is not a valid number", k, v, to))
+				}
+
+				// then validate first part of code range is smaller than the second part
+				if from >= to {
+					rangeErrors = append(rangeErrors, fmt.Errorf("%s: \"%v\" left side \"%v\" of code range must be smaller than the right side \"%v\"", k, v, from, to))
+				}
+			} else {
+				// range doesn't include two codes
+				rangeErrors = append(rangeErrors, fmt.Errorf("%s: \"%v\" a valid range must have two codes separated by a hyphen", k, v))
+			}
+
+			// bubble up errors only if all parsing attempts fail
+			if len(singleErrors) > 0 && len(rangeErrors) > 0 {
+				errors = append(errors, singleErrors...)
+				errors = append(errors, rangeErrors...)
+			}
 		}
-	} else {
-		// then if we fall here, we consider the input invalid
-		errors = append(errors, fmt.Errorf("%s: \"%v\" must either be a single erro code or a hyphen-separated range of codes", k, v))
 	}
 
 	return

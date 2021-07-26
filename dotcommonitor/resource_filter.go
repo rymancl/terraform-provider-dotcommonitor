@@ -11,6 +11,9 @@ import (
 	"github.com/rymancl/terraform-provider-dotcommonitor/dotcommonitor/client"
 )
 
+const IgnoreErrorsCodesSeparator = ";"
+const IgnoreErrorsCodesRangeSeparator = "-"
+
 func resourceFilter() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceFilterCreate,
@@ -72,11 +75,9 @@ func resourceFilter() *schema.Resource {
 							ValidateFunc: validation.StringInSlice([]string{"Validation", "Runtime", "CustomScript", "Certificate", "Cryptographic", "Tcp", "Dns", "Udp", "Http", "Ftp", "Sftp", "Smtp", "Pop3", "Imap", "Icmp", "IcmpV6", "DnsBL", "Media", "Sip"}, true),
 						},
 						"codes": {
-							Type:     schema.TypeSet,
-							Required: true,
-							MinItems: 1,
-							Elem:     &schema.Schema{Type: schema.TypeInt},
-							// ValidateFunc: validateIgnoreErrorsCodes,
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validateIgnoreErrorsCodes,
 						},
 					},
 				},
@@ -254,7 +255,7 @@ func expandIgnoreErrors(items *schema.Set) []client.Item {
 
 		itemList[i] = client.Item{
 			ErrorType:         strings.ToLower(schemaMap["type"].(string)),
-			ErrorCodeToIgnore: expandIntSet(schemaMap["codes"].(*schema.Set)),
+			ErrorCodeToIgnore: expandErrorCodesString(schemaMap["codes"].(string)),
 		}
 	}
 
@@ -264,11 +265,11 @@ func expandIgnoreErrors(items *schema.Set) []client.Item {
 // flattenIgnoreErrors ... flattens ignore errors objects to generic interface for state
 func flattenIgnoreErrors(ignoreErrors *[]client.Item) []map[string]interface{} {
 	l := make([]map[string]interface{}, 0)
-	
+
 	for _, item := range *ignoreErrors {
 		m := make(map[string]interface{})
 		m["type"] = strings.ToLower(item.ErrorType)
-		m["codes"] = item.ErrorCodeToIgnore
+		m["codes"] = flattenIgnoreErrorsCodes(item.ErrorCodeToIgnore)
 
 		l = append(l, m)
 	}
@@ -276,9 +277,59 @@ func flattenIgnoreErrors(ignoreErrors *[]client.Item) []map[string]interface{} {
 	return l
 }
 
-// // TODO
-// func convertErrorCodesStringToIntList(code *string) []int {
-// 	var codes []int
+// expandErrorCodesString ... expands an error codes string to a list of interfaces
+func expandErrorCodesString(codes string) []interface{} {
+	var l []interface{}
 
-// 	return codes
-// }
+	parts := strings.Split(codes, IgnoreErrorsCodesSeparator)
+
+	for _, item := range parts {
+		// first see if current item is a single error code
+		if i, err := strconv.Atoi(item); err != nil {
+			// not a single code, try a range
+			r := strings.Split(item, IgnoreErrorsCodesRangeSeparator)
+			if len(r) == 2 {
+				from, _ := strconv.Atoi(r[0])
+				to, _ := strconv.Atoi(r[1])
+				var errorRange = client.ErrorCodeToIgnoreRange{
+					From: from,
+					To:   to,
+				}
+				l = append(l, errorRange)
+			}
+		} else {
+			// current item must be a single error code
+			l = append(l, i)
+		}
+	}
+
+	return l
+}
+
+// flattenIgnoreErrorsCodes ... flattens a list of interfaces into an error codes string
+func flattenIgnoreErrorsCodes(codes []interface{}) string {
+	var sb strings.Builder
+
+	for _, item := range codes {
+		// first see if current item is a single error code
+		if i, ok := item.(float64); !ok {
+			// not a single code, try a range
+			var schemaMap = item.(map[string]interface{})
+			r := client.ErrorCodeToIgnoreRange{
+				From: int(schemaMap["From"].(float64)),
+				To:   int(schemaMap["To"].(float64)),
+			}
+			sb.WriteString(strconv.Itoa(r.From))
+			sb.WriteString(IgnoreErrorsCodesRangeSeparator)
+			sb.WriteString(strconv.Itoa(r.To))
+			sb.WriteString(IgnoreErrorsCodesSeparator)
+
+		} else {
+			// current item must be a single error code
+			sb.WriteString(strconv.Itoa(int(i)))
+			sb.WriteString(IgnoreErrorsCodesSeparator)
+		}
+	}
+
+	return strings.Trim(sb.String(), IgnoreErrorsCodesSeparator)
+}
