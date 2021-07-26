@@ -20,8 +20,14 @@ type Rule struct {
 
 // Item ... struct for filter errors to ignore
 type Item struct {
-	ErrorType         string `json:"Error_Type"`
-	ErrorCodeToIgnore []int  `json:"Error_Code_To_Ignore"`
+	ErrorType         string        `json:"Error_Type"`
+	ErrorCodeToIgnore []interface{} `json:"Error_Code_To_Ignore"`
+}
+
+// ErrorCodeToIgnoreRange ... struct for an Item ErrorCodeToIgnore range
+type ErrorCodeToIgnoreRange struct {
+	From int `json:"From"`
+	To   int `json:"To"`
 }
 
 // CreateFilterResponseBlock ... struct for create filter response
