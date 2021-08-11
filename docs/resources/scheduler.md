@@ -45,8 +45,8 @@ resource "dotcommonitor_device" "example" {
 * `enabled` - **(Optional, bool)** Indicates if the scheduler is enabled.
 
 ### excluded_time_intervals
-* `from` - **(Required, string)** The starting date/time during which monitoring should be excluded. Must be in "YYYY-MM-DDThh:mm:ssZ" format in UTC/GMT only (for example, "2014-06-01T00:00:00Z"). The input gets converted to [Unix epoch](https://en.wikipedia.org/wiki/Unix_time) time before being passed to the API.
-* `to` - **(Required, string)** The ending date/time during which monitoring should be excluded. Must be in "YYYY-MM-DDThh:mm:ssZ" format in UTC/GMT only (for example, "2014-06-01T00:00:00Z"). The input gets converted to [Unix epoch](https://en.wikipedia.org/wiki/Unix_time) time before being passed to the API.
+* `from` - **(Required, string)** The starting date/time during which monitoring should be excluded. Must be in "YYYY-MM-DDThh:mmZ" format in UTC/GMT only (for example, "2014-06-01T00:00Z"). The input gets converted to [Unix epoch](https://en.wikipedia.org/wiki/Unix_time) time before being passed to the API.
+* `to` - **(Required, string)** The ending date/time during which monitoring should be excluded. Must be in "YYYY-MM-DDThh:mmZ" format in UTC/GMT only (for example, "2014-06-01T00:00Z"). The input gets converted to [Unix epoch](https://en.wikipedia.org/wiki/Unix_time) time before being passed to the API.
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:
