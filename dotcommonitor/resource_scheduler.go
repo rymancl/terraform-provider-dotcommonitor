@@ -12,7 +12,7 @@ import (
 	"github.com/rymancl/terraform-provider-dotcommonitor/dotcommonitor/client"
 )
 
-const schedulerExcludedTimeIntervalLayout = "2006-01-02T15:04:05Z"
+const schedulerExcludedTimeIntervalLayout = "2006-01-02T15:04Z"
 
 func resourceScheduler() *schema.Resource {
 	return &schema.Resource{
@@ -273,8 +273,6 @@ func flattenSchedulerWeeklyIntervalsList(weeklyIntervals *[]client.WeeklyInterva
 
 // expandSchedulerExcludedTimeIntervalsList ... constructs a list of dotcommonitor.DateTimeInterval structs based on the set of excluded_time_intervals in the TF configuration
 func expandSchedulerExcludedTimeIntervalsList(excludedTimeIntervals *schema.Set) []client.DateTimeInterval {
-	//log.Printf("[Dotcom-Monitor] Converting excluded_time_intervals list to dotcommonitor.DateTimeInterval list")
-
 	etList := make([]client.DateTimeInterval, len(excludedTimeIntervals.List()))
 
 	for i, item := range excludedTimeIntervals.List() {
