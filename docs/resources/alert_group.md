@@ -38,6 +38,12 @@ resource "dotcommonitor_group" "example" {
     type            = "AlertOps"
     integration_url = "url_goes_here"
   }
+  addresses {
+    type      = "Snmp"
+    community = "testcommunity"
+    host      = "testhost"
+    version   = "V1"
+  }
 }
 ```
 
@@ -47,7 +53,7 @@ resource "dotcommonitor_group" "example" {
 * `addresses` - **(Optional, set{object})** Configuration block for an address. Can be specified multiple times for each address. Each block supports the fields documented below.
 
 ### addresses
-* `type` - **(Required, string)** The type of address. Can be one of "Email", "Phone", "Sms", "PagerDuty", "Slack", "Teams", "AlertOps".
+* `type` - **(Required, string)** The type of address. Can be one of "Email", "Phone", "Sms", "PagerDuty", "Slack", "Teams", "AlertOps", "Snmp".
 * `template_id` - **(Optional, int)** The valid ID of the group template. Defaults to 0 (default template).
 * `address` - **(Optional, string)** The address. Valid for "Email" `type` argument.
 * `number` - **(Optional, string)** The number. Valid for "Phone" and "Sms" `type` argument.
@@ -55,6 +61,10 @@ resource "dotcommonitor_group" "example" {
 * `integration_key` - **(Optional, string)** The PagerDuty integration key. Valid for "PagerDuty" `type` argument.
 * `integration_url` - **(Optional, string)** The AlertOps integration URL. Valid for "AlertOps" `type` argument.
 * `webhook` - **(Optional, string)** The webhook URL. Valid for "Slack" and "Teams" `type` argument.
+* `community` - **(Optional, string)** The SNMP community. Valid for "Snmp" `type` argument.
+* `host` - **(Optional, string)** The SNMP host. Valid for "Snmp" `type` argument.
+* `user_id` - **(Optional, int)** The ID of the SNMP user configured in Dotcom-Monitor. Note that the API does not expose SNMP users and the web console does not expose the ID, therefore you may need to contact support to obtain the IDs of SNMP users. Valid for "Snmp" `type` argument.
+* `version` - **(Optional, string)** The SNMP version. Valid for "Snmp" `type` argument. Can be one of "V1", "V2c", "V3".
 
 ## Attribute Reference
 In addition to all arguments above, the following attributes are exported:

@@ -38,7 +38,7 @@ func resourceGroup() *schema.Resource {
 						"type": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"Email", "Phone", "Sms", "PagerDuty", "Slack", "Teams", "AlertOps"}, true),
+							ValidateFunc: validation.StringInSlice([]string{"Email", "Phone", "Sms", "PagerDuty", "Slack", "Teams", "AlertOps", "Snmp"}, true),
 						},
 						"template_id": {
 							Type:         schema.TypeInt,
@@ -81,6 +81,25 @@ func resourceGroup() *schema.Resource {
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validation.StringLenBetween(1, 255),
+						},
+						"community": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(1, 255),
+						},
+						"host": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(1, 255),
+						},
+						"user_id": {
+							Type:     schema.TypeInt,
+							Optional: true,
+						},
+						"version": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"V1", "V2c", "V3"}, true),
 						},
 					},
 				},
@@ -245,6 +264,11 @@ func expandGroupAddresses(schemaAddresses *schema.Set) []client.Addresses {
 			addressList[i].WebHook = schemaMap["webhook"].(string)
 		case "Teams":
 			addressList[i].WebHook = schemaMap["webhook"].(string)
+		case "Snmp":
+			addressList[i].Community = schemaMap["community"].(string)
+			addressList[i].Host = schemaMap["host"].(string)
+			addressList[i].UserID = schemaMap["user_id"].(int)
+			addressList[i].Version = schemaMap["version"].(string)
 			// case "Script":
 			// 	addressList[i].Message = schemaMap["message"].(string)
 		}
