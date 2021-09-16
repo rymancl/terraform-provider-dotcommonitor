@@ -48,7 +48,7 @@ func resourceScheduler() *schema.Resource {
 							Optional: true,
 							Default:  "0h0m",
 							ValidateFunc: validation.All(
-								validation.StringMatch(regexp.MustCompile("^([0-9]|[12][0-3])h([0-5]?[0-9])m$"), "must be in the format of [0-23]h[0-59]m"),
+								validation.StringMatch(regexp.MustCompile("^([0-9]|[1][0-9]|[2][0-4])h([0-5]?[0-9])m$"), "must be in the format of [0-23]h[0-59]m"),
 								validateWeeklyIntervalFrom(),
 							),
 						},
@@ -57,7 +57,7 @@ func resourceScheduler() *schema.Resource {
 							Optional: true,
 							Default:  "24h0m", // end of day
 							ValidateFunc: validation.All(
-								validation.StringMatch(regexp.MustCompile("^([0-9]|[12][0-4])h([0-5]?[0-9])m$"), "must be in the format of [0-24]h[0-59]m"),
+								validation.StringMatch(regexp.MustCompile("^([0-9]|[1][0-9]|[2][0-4])h([0-5]?[0-9])m$"), "must be in the format of [0-24]h[0-59]m"),
 								validateWeeklyIntervalTo(),
 							),
 						},
