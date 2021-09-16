@@ -19,6 +19,10 @@ type Addresses struct {
 	IntegrationKey string `json:"IntegrationKey,omitempty"` // for PagerDuty
 	IntegrationURL string `json:"IntegrationURL,omitempty"` // for AlertOps
 	WebHook        string `json:"WebHook,omitempty"`        // for Slack, Teams
+	Community      string `json:"Community,omitempty"`      // for SNMP
+	Host           string `json:"Host,omitempty"`           // for SNMP
+	UserID         int    `json:"UserId,omitempty"`         // for SNMP
+	Version        string `json:"Version,omitempty"`        // for SNMP
 	// Message        string `json:"Message,omitempty"`        // for Script?
 }
 
