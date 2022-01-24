@@ -41,7 +41,7 @@ resource "dotcommonitor_device" "example" {
 ### weekly_intervals
 * `days` - **(Required, list{string})** The days the scheduler is active. Can be a list of any of "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa".
 * `from` - **(Optional, string)** The time of day when the scheduler becomes active. Must be in the format of `##h##m`. The input gets convered to minutes before being passed to the API. Defaults to "0h0m" (start of day).
-* `to` - **(Optional, string)** The time of day when the scheduler turns inactive. Must be in the format of `##h##m`. The input gets convered to minutes before being passed to the API. Defaults to "24h0m" (end of day).
+* `to` - **(Optional, string)** The time of day when the scheduler turns inactive. Must be in the format of `##h##m`. The input gets convered to minutes before being passed to the API. Defaults to "23h59m" (end of day).
 * `enabled` - **(Optional, bool)** Indicates if the scheduler is enabled.
 
 ### excluded_time_intervals
