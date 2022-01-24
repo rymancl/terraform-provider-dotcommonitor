@@ -90,10 +90,10 @@ func validateWeeklyIntervalFrom() schema.SchemaValidateFunc {
 		if d, err := time.ParseDuration(v); err != nil {
 			es = append(es, fmt.Errorf("%s: unable to parse \"%v\" as duration, must be in the format of #h#m", k, v))
 		} else {
-			// then verify minutes are between 0 & 1439
+			// then verify minutes are between 0 & 1438
 			mins := int(d.Minutes())
-			if mins < 0 || mins > 1439 {
-				es = append(es, fmt.Errorf("%s: \"%v\", converted to \"%v\" minutes, is invalid - from time must be between 0 & 1439 minutes", k, v, mins))
+			if mins < 0 || mins > 1438 {
+				es = append(es, fmt.Errorf("%s: \"%v\", converted to \"%v\" minutes, is invalid - from time must be between 0 & 1438 minutes", k, v, mins))
 			}
 		}
 
@@ -117,10 +117,10 @@ func validateWeeklyIntervalTo() schema.SchemaValidateFunc {
 		if d, err := time.ParseDuration(v); err != nil {
 			es = append(es, fmt.Errorf("%s: unable to parse \"%v\" as duration, must be in the format of #h#m", k, v))
 		} else {
-			// then verify minutes are between 1 & 1440
+			// then verify minutes are between 1 & 1439
 			mins := int(d.Minutes())
-			if mins < 0 || mins > 1440 {
-				es = append(es, fmt.Errorf("%s: \"%v\", converted to \"%v\" minutes, is invalid - to time must be between 1 & 1440 minutes", k, v, mins))
+			if mins < 1 || mins > 1439 {
+				es = append(es, fmt.Errorf("%s: \"%v\", converted to \"%v\" minutes, is invalid - to time must be between 1 & 1439 minutes", k, v, mins))
 			}
 		}
 		return
